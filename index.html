@@ -3,93 +3,200 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Основи роботи з Git</title>
+    <title>Довідник з роботи з Git</title>
     <style>
+        /* Загальні стилі сайту */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
             background-color: #1e1e24;
             color: #e0e0e6;
             margin: 0;
-            padding: 0;
+            padding-top: 70px; /* Відступ, щоб шапка не перекривала контент */
+            scroll-behavior: smooth; /* Плавний скролл по меню */
         }
+
+        /* Стильна фіксована шапка з меню навігації */
         header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
             background-color: #111116;
-            padding: 2rem;
-            text-align: center;
             border-bottom: 3px solid #f05032;
+            z-index: 1000;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
-        h1 { margin: 0; color: #ffffff; }
-        h2 { color: #f05032; margin-top: 2rem; border-bottom: 1px solid #3a3a44; padding-bottom: 0.5rem; }
-        .container { max-width: 850px; margin: 0 auto; padding: 2rem; }
-        .advantages, .sources { list-style-type: square; padding-left: 20px; }
+
+        .nav-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 2rem;
+        }
+
+        .logo {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #ffffff;
+        }
+        .logo span { color: #f05032; }
+
+        nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            gap: 20px;
+        }
+
+        nav a {
+            color: #e0e0e6;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+            font-size: 0.95rem;
+        }
+
+        nav a:hover {
+            color: #f05032;
+        }
+
+        /* Головний контейнер для контенту */
+        .container { 
+            max-width: 850px; 
+            margin: 0 auto; 
+            padding: 2rem; 
+        }
+
+        /* Оформлення секцій */
+        section {
+            background-color: #22222b;
+            padding: 2rem;
+            border-radius: 8px;
+            margin-bottom: 2.5rem;
+            border: 1px solid #2d2d38;
+        }
+
+        h2 { 
+            color: #f05032; 
+            margin-top: 0; 
+            border-bottom: 1px solid #3a3a44; 
+            padding-bottom: 0.5rem; 
+        }
+
+        .advantages, .sources { 
+            list-style-type: square; 
+            padding-left: 20px; 
+        }
+
+        .advantages li, .sources li {
+            margin-bottom: 8px;
+        }
+
+        /* Таблиця з командами */
         .command-table {
             width: 100%;
             border-collapse: collapse;
-            margin: 1.5rem 0;
+            margin: 1.5rem 0 0 0;
             background-color: #282830;
         }
+
         .command-table th, .command-table td {
             border: 1px solid #3a3a44;
             padding: 12px;
             text-align: left;
         }
-        .command-table th { background-color: #f05032; color: white; }
-        code { background-color: #111116; color: #ff79c6; padding: 2px 6px; border-radius: 4px; font-family: 'Courier New', Courier, monospace; }
+
+        .command-table th { 
+            background-color: #f05032; 
+            color: white; 
+        }
+
+        code { 
+            background-color: #111116; 
+            color: #ff79c6; 
+            padding: 3px 6px; 
+            border-radius: 4px; 
+            font-family: 'Courier New', Courier, monospace; 
+            font-size: 0.9rem;
+        }
+
         a { color: #50fa7b; text-decoration: none; }
         a:hover { text-decoration: underline; }
+
+        /* Блок сертифіката */
         .cert-box {
-            border: 2px dashed #f05032;
-            padding: 1.5rem;
             text-align: center;
-            border-radius: 8px;
-            margin-top: 2rem;
-            background-color: #22222b;
         }
-        .cert-img { max-width: 100%; height: auto; border-radius: 4px; margin-top: 10px; }
+
+        .cert-img { 
+            max-width: 100%; 
+            height: auto; 
+            border-radius: 6px; 
+            margin-top: 15px; 
+            border: 1px solid #3a3a44;
+        }
     </style>
 </head>
 <body>
 
+<!-- Шапка з кнопками навігації по сайту -->
 <header>
-    <h1>Практичне освоєння Git & GitHub</h1>
-    <p>Короткий довідник, команди та сертификація</p>
+    <div class="nav-container">
+        <div class="logo">Лабораторна<span>.Git</span></div>
+        <nav>
+            <ul>
+                <li><a href="#about">Про Git</a></li>
+                <li><a href="#advantages">Переваги</a></li>
+                <li><a href="#commands">Команди</a></li>
+                <li><a href="#certificate">Сертифікат</a></li>
+                <li><a href="#sources">Джерела</a></li>
+            </ul>
+        </nav>
+    </div>
 </header>
 
 <div class="container">
-    <section>
+
+    <!-- Розділ 1: Що таке Git -->
+    <section id="about">
         <h2>Що таке системи контролю версій та Git?</h2>
-        <p><strong>Система контролю версій (VCS)</strong> — це софт, який фіксує зміни у файлах проекту з плином часу. Завдяки цьому можна повернутися до будь-якого попереднього стану коду, подивитися, хто саме зробив помилку, або паралельно розробляти нові фічі, не ламаючи основну версію продукту.</p>
-        <p><strong>Git</strong> — це найпопулярніша сьогодні розподілена система контролю версій. Її створив Лінус Торвальдс (автор Linux). "Розподілена" означає, що кожен розробник має на своєму комп'ютері повну копію всієї історії проекту, а не просто завантажує файли з одного центрального сервера.</p>
+        <p><strong>Система контролю версій (VCS)</strong> — це спеціальне програмне забезпечення, яке фіксує зміни у файлах проекту з плином часу. Завдяки цьому можна легко повернутися до будь-якого попереднього стану коду, подивитися історію змін або паралельно розробляти нові фічі, не ризикуючи зламати основну версію продукту.</p>
+        <p><strong>Git</strong> — це найпопулярніша сьогодні розподілена система контролю версій. Її створив Лінус Торвальдс (автор операційної системи Linux). Термін "розподілена" означає, що кожен розробник має на своєму комп'ютері повну копію всієї історії проекту, а не просто завантажує окремі файли з центрального сервера.</p>
     </section>
 
-    <section>
-        <h2>Головні переваги Git</h2>
+    <!-- Розділ 2: Переваги -->
+    <section id="advantages">
+        <h2>Головні переваги використання Git</h2>
         <ul class="advantages">
-            <li><strong>Швидкість роботи:</strong> майже всі операції відбуваються локально на комп'ютері, тому немає затримок через інтернет.</li>
-            <li><strong>Зручне розгалуження (Branching):</strong> можна створити окрему гілку для експериментів, а потім легко злити її з основним кодом.</li>
-            <li><strong>Надійність:</strong> кожен комміт має унікальний хеш (SHA-1), що унеможливлює непомітну зміну чи пошкодження файлів.</li>
-            <li><strong>Робота в команді:</strong> Git дозволяє тисячам людей одночасно працювати над одним проектом без хаосу.</li>
+            <li><strong>Висока швидкість роботи:</strong> майже всі операції (комміти, перегляд історії) відбуваються локально на комп'ютері розробника, тому немає затримок через якість інтернет-з'єднання.</li>
+            <li><strong>Зручне розгалуження (Branching):</strong> можна створити окрему гілку для експериментів чи нової фічі, а потім швидко і безпечно злити її з основним кодом проекту.</li>
+            <li><strong>Надійність та цілісність даних:</strong> кожен комміт отримує унікальний криптографічний хеш (SHA-1). Це повністю унеможливлює непомітну зміну чи пошкодження файлів проекту.</li>
+            <li><strong>Ефективна командна розробка:</strong> Git надає зручні інструменти розв'язання конфліктів у коді, дозволяючи багатьом людям одночасно працювати над спільними файлами.</li>
         </ul>
     </section>
 
-    <section>
-        <h2>10 базових команд Git для щоденної роботи</h2>
+    <!-- Розділ 3: 10 команд -->
+    <section id="commands">
+        <h2>10 базових команд Git для роботи</h2>
         <table class="command-table">
             <thead>
                 <tr>
                     <th>Команда</th>
-                    <th>Що вона робить (коментар)</th>
+                    <th>Опис та коментар</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
                     <td><code>git init</code></td>
-                    <td>Створює новий порожній локальний репозиторій у поточній папці.</td>
+                    <td>Створює новий порожній локальний репозиторій у поточній папці комп'ютера.</td>
                 </tr>
                 <tr>
                     <td><code>git clone &lt;url&gt;</code></td>
-                    <td>Копіює вже існуючий проект з віддаленого сервера (наприклад, з GitHub) на твій ПК.</td>
+                    <td>Копіює існуючий проект з віддаленого сервера (наприклад, з GitHub) на твій ПК.</td>
                 </tr>
                 <tr>
                     <td><code>git status</code></td>
@@ -97,11 +204,11 @@
                 </tr>
                 <tr>
                     <td><code>git add &lt;file&gt;</code></td>
-                    <td>Додає конкретний файл до індексу (staging area) для наступного збереження. <code>git add .</code> додасть усі файли.</td>
+                    <td>Додає конкретний файл до індексу для наступного збереження. Команда <code>git add .</code> заіндексує всі файли.</td>
                 </tr>
                 <tr>
                     <td><code>git commit -m "опис"</code></td>
-                    <td>Зберігає всі заіндексовані зміни, створюючи "знімок" коду з текстовим коментарем.</td>
+                    <td>Зберігає всі заіндексовані зміни, створюючи стабільний "знімок" коду з текстовим коментарем.</td>
                 </tr>
                 <tr>
                     <td><code>git branch &lt;name&gt;</code></td>
@@ -109,7 +216,7 @@
                 </tr>
                 <tr>
                     <td><code>git checkout &lt;branch&gt;</code></td>
-                    <td>Перемикає робоче серевовище на іншу гілку (або на конкретний старий комміт).</td>
+                    <td>Перемикає робоче середовище на іншу гілку (або на конкретний старий комміт).</td>
                 </tr>
                 <tr>
                     <td><code>git merge &lt;branch&gt;</code></td>
@@ -127,14 +234,16 @@
         </table>
     </section>
 
-    <section class="cert-box">
+    <!-- Розділ 4: Сертифікат -->
+    <section id="certificate" class="cert-box">
         <h2>Сертифікат про проходження курсу</h2>
-        <p>Успішно завершено базовий курс вивчення технології Git.</p>
+        <p>Успішно завершено базовий теоретичний та практичний курс вивчення технології Git.</p>
         <img src="certificate.png" alt="Сертифікат Git" class="cert-img">
     </section>
 
-    <section>
-        <h2>Джерела інформації</h2>
+    <!-- Розділ 5: Джерела -->
+    <section id="sources">
+        <h2>Корисні джерела інформації</h2>
         <ul class="sources">
             <li><a href="https://git-scm.com" target="_blank">Pro Git Book (Офіційна книга, є переклад)</a></li>
             <li><a href="https://githowto.com" target="_blank">Git How To — Інтерактивний тур-довідник</a></li>
