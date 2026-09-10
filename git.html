@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Технологія Git | Довідник</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; line-height: 1.6; background-color: #1e1e24; color: #e0e0e6; margin: 0; padding-top: 70px; }
+        header { position: fixed; top: 0; left: 0; width: 100%; background-color: #111116; border-bottom: 3px solid #f05032; z-index: 1000; }
+        .nav-container { max-width: 1000px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 0.8rem 2rem; }
+        .logo { font-size: 1.4rem; font-weight: bold; color: #ffffff; }
+        .logo span { color: #f05032; }
+        nav ul { list-style: none; margin: 0; padding: 0; display: flex; gap: 20px; }
+        nav a { color: #e0e0e6; text-decoration: none; font-weight: 500; transition: color 0.3s; }
+        nav a:hover, nav a.active { color: #f05032; }
+        .container { max-width: 850px; margin: 0 auto; padding: 2rem; }
+        section { background-color: #22222b; padding: 2rem; border-radius: 8px; margin-bottom: 2rem; border: 1px solid #2d2d38; }
+        h2 { color: #f05032; margin-top: 0; border-bottom: 1px solid #3a3a44; padding-bottom: 0.5rem; }
+        ul { list-style-type: square; padding-left: 20px; }
+        li { margin-bottom: 8px; }
+        a { color: #50fa7b; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .cert-box { text-align: center; }
+        .cert-img { max-width: 100%; height: auto; border-radius: 6px; margin-top: 15px; border: 1px solid #3a3a44; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="nav-container">
+        <div class="logo">Лабораторна<span>.СКВ</span></div>
+        <nav>
+            <ul>
+                <li><a href="index.html">Головна</a></li>
+                <li><a href="git.html" class="active">Робота з Git</a></li>
+                <li><a href="bash.html">Команди Bash</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<div class="container">
+    <section>
+        <h2>Що таке Git?</h2>
+        <p><strong>Git</strong> — это найпопулярніша у світі розподілена система контролю версій. Вона дозволяє фіксувати зміни у файлах коду, відкочуватися до попередніх версій проекту та вести розробку паралельно за допомогою гілок.</p>
+        <p>Оскільки система розподілена, кожен розробник має на своєму ПК локальну копію всієї історії проекту, що гарантує високу швидкість та повну незалежність від сервера.</p>
+    </section>
+
+    <section>
+        <h2>Переваги використання Git</h2>
+        <ul>
+            <li><strong>Локальна швидкість:</strong> комміти та перегляд історії відбуваються миттєво без інтернету.</li>
+            <li><strong>Потужне розгалуження:</strong> легке створення ізольованих гілок для кожної нової фічі.</li>
+            <li><strong>Надійність:</strong> захист даних за допомогою унікальних хешів SHA-1.</li>
+        </ul>
+    </section>
+
+    <section class="cert-box">
+        <h2>Сертифікат курсу</h2>
+        <p>Документ, що підтверджує успішне освоєння базового курсу Git.</p>
+        <img src="certificate.png" alt="Сертифікат Git" class="cert-img">
+    </section>
+
+    <section>
+        <h2>Джерела інформації</h2>
+        <ul>
+            <li><a href="https://git-scm.com" target="_blank">Pro Git Book (Офіційний підручник)</a></li>
+            <li><a href="https://githowto.com" target="_blank">Git How To (Практичний курс)</a></li>
+        </ul>
+    </section>
+</div>
+
+</body>
+</html>
