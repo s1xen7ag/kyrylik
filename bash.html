@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Команди Bash & Git | Шпаргалка</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; line-height: 1.6; background-color: #1e1e24; color: #e0e0e6; margin: 0; padding-top: 70px; }
+        header { position: fixed; top: 0; left: 0; width: 100%; background-color: #111116; border-bottom: 3px solid #f05032; z-index: 1000; }
+        .nav-container { max-width: 1000px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 0.8rem 2rem; }
+        .logo { font-size: 1.4rem; font-weight: bold; color: #ffffff; }
+        .logo span { color: #f05032; }
+        nav ul { list-style: none; margin: 0; padding: 0; display: flex; gap: 20px; }
+        nav a { color: #e0e0e6; text-decoration: none; font-weight: 500; transition: color 0.3s; }
+        nav a:hover, nav a.active { color: #f05032; }
+        .container { max-width: 850px; margin: 0 auto; padding: 2rem; }
+        section { background-color: #22222b; padding: 2rem; border-radius: 8px; border: 1px solid #2d2d38; }
+        h2 { color: #f05032; margin-top: 0; border-bottom: 1px solid #3a3a44; padding-bottom: 0.5rem; }
+        .command-table { width: 100%; border-collapse: collapse; margin-top: 1.5rem; background-color: #282830; }
+        .command-table th, .command-table td { border: 1px solid #3a3a44; padding: 12px; text-align: left; }
+        .command-table th { background-color: #f05032; color: white; }
+        code { background-color: #111116; color: #ff79c6; padding: 3px 6px; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="nav-container">
+        <div class="logo">Лабораторна<span>.СКВ</span></div>
+        <nav>
+            <ul>
+                <li><a href="index.html">Головна</a></li>
+                <li><a href="git.html">Робота з Git</a></li>
+                <li><a href="bash.html" class="active">Команди Bash</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<div class="container">
+    <section>
+        <h2>Шпаргалка базових команд терміналу та Git</h2>
+        <p>Нижче наведено список із 10 ключових команд, необхідних для ініціалізації проекту та керування версіями через консольний інтерфейс Bash:</p>
+        
+        <table class="command-table">
+            <thead>
+                <tr>
+                    <th>Команда</th>
+                    <th>Контекст / Що вона виконує</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td><code>git init</code></td><td>Створює новий порожній локальний репозиторій у поточній папці.</td></tr>
+                <tr><td><code>git status</code></td><td>Показує стан файлів: які змінено, які додано до індексу розробником.</td></tr>
+                <tr><td><code>git add .</code></td><td>Додає абсолютно всі нові або змінені файли поточної папки до індексу збереження.</td></tr>
+                <tr><td><code>git commit -m "опис"</code></td><td>Робить фіксацію (знімок) заіндексованих змін із коментарем.</td></tr>
+                <tr><td><code>git branch -M main</code></td><td>Примусово перейменовує поточну головну гілку репозиторію на "main".</td></tr>
+                <tr><td><code>git remote add origin &lt;url&gt;</code></td><td>Прив'язує локальну папку до віддаленого репозиторію на GitHub.</td></tr>
+                <tr><td><code>git push -u origin main</code></td><td>Відправляє локальні комміти у хмару на GitHub і запам'ятовує гілку.</td></tr>
+                <tr><td><code>git clone &lt;url&gt;</code></td><td>Клонує (завантажує) готовий проект з GitHub у нову папку на ПК.</td></tr>
+                <tr><td><code>git log</code></td><td>Виводить детальну історію всіх коммітів проекту з їхніми авторами та ID.</td></tr>
+                <tr><td><code>git pull</code></td><td>Підтягує та автоматично зливає останні зміни з сервера у твій робочий код.</td></tr>
+            </tbody>
+        </table>
+    </section>
+</div>
+
+</body>
+</html>
