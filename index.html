@@ -8,7 +8,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
         /* ========================================
            LOADER — TYPEWRITER ON BLACK SCREEN
            ======================================== */
@@ -18,14 +17,20 @@
             display: flex; flex-direction: column;
             align-items: center; justify-content: center;
             transition: opacity 1s ease, visibility 1s ease;
+            opacity: 1;
+            transition: opacity 0.9s ease, visibility 0.9s ease;
         }
         .loader-overlay.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
-
+        .loader-overlay.hidden {
+            opacity: 0; visibility: hidden; pointer-events: none;
+        }
         /* Typewriter area */
+        /* Typewriter */
         .typewriter-area {
             text-align: center;
+            text-align: left;
+            min-width: 340px;
         }
-
         .type-line {
             font-family: 'Fira Code', 'Courier New', monospace;
             font-size: 1.1rem;
@@ -33,308 +38,15 @@
             white-space: nowrap;
             overflow: hidden;
             width: 0;
+            display: block;
+            margin-bottom: 6px;
+            min-height: 1.6em;
+        }
+        .type-line .prefix { color: #50fa7b; }
+        .type-line .text   { color: #888; }
+        .type-line.highlight .text { color: #ccc; font-size: 1.05em; }
+        /* Blinking cursor */
+        .cursor {
             display: inline-block;
             border-right: 2px solid #444;
-        }
-        .type-line.line1 {
-            animation: type-line1 0.8s steps(18) 0.3s forwards, cursor-blink 0.5s step-end 0.3s 3;
-        }
-        .type-line.line2 {
-            color: #999;
-            font-size: 1.3rem;
-            animation: type-line2 1.2s steps(25) 1.4s forwards, cursor-blink 0.5s step-end 1.4s 4;
-        }
-        .type-line.done { border-right-color: transparent; }
-
-        @keyframes type-line1 { to { width: 18ch; } }
-        @keyframes type-line2 { to { width: 25ch; } }
-        @keyframes cursor-blink { 50% { border-color: transparent; } }
-
-        /* Logos container */
-        .loader-logos {
-            display: flex; align-items: center; justify-content: center;
-            gap: 40px; margin-top: 40px;
-            opacity: 0;
-            animation: logosIn 0.8s ease 3s forwards;
-        }
-        @keyframes logosIn {
-            0% { opacity: 0; transform: translateY(12px); }
-            100% { opacity: 1; transform: translateY(0); }
-        }
-
-        .loader-logo-item {
-            display: flex; flex-direction: column;
-            align-items: center; gap: 10px;
-        }
-        .loader-logo-item span {
-            font-family: 'Inter', sans-serif;
-            font-size: 0.8rem; font-weight: 600;
-            letter-spacing: 1.5px; text-transform: uppercase;
-        }
-
-        /* Gemini sparkle SVG */
-        .gemini-logo svg {
-            width: 44px; height: 44px;
-        }
-        .gemini-logo span { color: #8be9fd; }
-        .gemini-path {
-            fill: none; stroke: #8be9fd; stroke-width: 1.5;
-            stroke-dasharray: 300; stroke-dashoffset: 300;
-            animation: drawLogo 1.2s ease 3.2s forwards;
-        }
-        .gemini-fill {
-            fill: #8be9fd; opacity: 0;
-            animation: fillIn 0.5s ease 4.2s forwards;
-        }
-
-        /* Antigravity logo SVG */
-        .agy-logo svg {
-            width: 44px; height: 44px;
-        }
-        .agy-logo span { color: #f05032; }
-        .agy-path {
-            fill: none; stroke: #f05032; stroke-width: 1.5;
-            stroke-dasharray: 200; stroke-dashoffset: 200;
-            animation: drawLogo 1.2s ease 3.4s forwards;
-        }
-        .agy-fill {
-            fill: #f05032; opacity: 0;
-            animation: fillIn 0.5s ease 4.4s forwards;
-        }
-
-        @keyframes drawLogo { to { stroke-dashoffset: 0; } }
-        @keyframes fillIn   { to { opacity: 1; } }
-
-        /* Ampersand between logos */
-        .logo-amp {
-            font-family: 'Fira Code', monospace;
-            font-size: 1.4rem; color: #333;
-            opacity: 0;
-            animation: fadeIn 0.4s ease 3.1s forwards;
-        }
-        @keyframes fadeIn { to { opacity: 1; } }
-
-        /* Subtle bottom bar */
-        .loader-bottom-bar {
-            position: absolute; bottom: 40px;
-            width: 120px; height: 1px; background: #1a1a1a;
-            border-radius: 1px; overflow: hidden;
-            opacity: 0; animation: fadeIn 0.3s ease 0.2s forwards;
-        }
-        .loader-bottom-bar::after {
-            content: ''; display: block;
-            height: 100%; width: 0;
-            background: linear-gradient(90deg, #333, #555);
-            animation: loadBar 4.5s ease 0.5s forwards;
-        }
-        @keyframes loadBar { to { width: 100%; } }
-
-        /* ========================================
-           MAIN SITE STYLES
-           ======================================== */
-        body {
-            font-family: 'Inter', 'Segoe UI', sans-serif;
-            line-height: 1.7; background-color: #0f0f15; color: #e0e0e6;
-            padding-top: 70px;
-            opacity: 0; transition: opacity 0.8s ease 0.2s;
-        }
-        body.loaded { opacity: 1; }
-
-        body::before {
-            content: ''; position: fixed; inset: 0; z-index: -1;
-            background-image:
-                linear-gradient(rgba(240,80,50,0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(240,80,50,0.03) 1px, transparent 1px);
-            background-size: 60px 60px;
-        }
-
-        /* HEADER */
-        header {
-            position: fixed; top: 0; left: 0; width: 100%;
-            background: rgba(13,13,18,0.92); backdrop-filter: blur(14px);
-            border-bottom: 2px solid #f05032; z-index: 1000;
-        }
-        .nav-container {
-            max-width: 1000px; margin: 0 auto;
-            display: flex; justify-content: space-between;
-            align-items: center; padding: 0.8rem 2rem;
-        }
-        .logo {
-            font-size: 1.4rem; font-weight: 800; letter-spacing: -0.5px;
-            text-decoration: none; color: #fff;
-        }
-        .logo span { color: #f05032; }
-        .logo:hover { text-decoration: none; }
-        nav ul { list-style: none; display: flex; gap: 24px; }
-        nav ul li { background: none; border: none; padding: 0; margin: 0; }
-        nav a {
-            color: #b0b0b8; text-decoration: none; font-weight: 600;
-            font-size: 0.95rem; position: relative; transition: color 0.3s;
-        }
-        nav a::after {
-            content: ''; position: absolute; bottom: -4px; left: 0;
-            width: 0; height: 2px; background: #f05032;
-            transition: width 0.3s ease;
-        }
-        nav a:hover, nav a.active { color: #fff; }
-        nav a:hover::after, nav a.active::after { width: 100%; }
-
-        /* HERO */
-        .container { max-width: 850px; margin: 0 auto; padding: 3rem 2rem; text-align: center; }
-        .hero {
-            background: linear-gradient(145deg, #16161e 0%, #1c1c26 100%);
-            padding: 3.5rem; border-radius: 16px;
-            border: 1px solid #2a2a36; margin-top: 2rem;
-            position: relative; overflow: hidden;
-        }
-        .hero::before {
-            content: ''; position: absolute; top: -80px; right: -80px;
-            width: 220px; height: 220px; border-radius: 50%;
-            background: radial-gradient(circle, rgba(240,80,50,0.12), transparent 70%);
-        }
-        .hero::after {
-            content: ''; position: absolute; bottom: -60px; left: -60px;
-            width: 180px; height: 180px; border-radius: 50%;
-            background: radial-gradient(circle, rgba(80,250,123,0.08), transparent 70%);
-        }
-        h1 { color: #fff; font-size: 2rem; font-weight: 800; margin-bottom: 1rem; letter-spacing: -0.5px; }
-        h1 em { font-style: normal; color: #f05032; }
-        .hero p { font-size: 1.05rem; color: #999; max-width: 600px; margin: 0 auto 0.8rem; }
-
-        .btn-container { margin-top: 2.5rem; display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; }
-        .btn {
-            display: inline-flex; align-items: center; gap: 8px;
-            background: linear-gradient(135deg, #f05032, #d43f21);
-            color: #fff; padding: 13px 28px;
-            text-decoration: none; border-radius: 8px;
-            font-weight: 700; font-size: 0.95rem;
-            transition: transform 0.2s, box-shadow 0.3s;
-            box-shadow: 0 4px 18px rgba(240,80,50,0.25);
-        }
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(240,80,50,0.4); text-decoration: none; }
-        .btn-alt {
-            background: linear-gradient(135deg, #2a2a36, #3a3a44);
-            box-shadow: 0 4px 14px rgba(0,0,0,0.3);
-        }
-        .btn-alt:hover { box-shadow: 0 6px 20px rgba(0,0,0,0.5); }
-
-        /* AI BADGE */
-        .ai-badge {
-            display: inline-flex; align-items: center; gap: 8px;
-            margin-top: 2.5rem; padding: 8px 18px;
-            background: rgba(139,233,253,0.08);
-            border: 1px solid rgba(139,233,253,0.2);
-            border-radius: 20px; font-size: 0.82rem;
-            color: #8be9fd; font-weight: 500;
-        }
-        .ai-badge .pulse {
-            width: 8px; height: 8px; border-radius: 50%;
-            background: #8be9fd; position: relative;
-        }
-        .ai-badge .pulse::after {
-            content: ''; position: absolute; inset: -3px;
-            border-radius: 50%; border: 1px solid #8be9fd;
-            animation: pulsate 1.8s ease-out infinite;
-        }
-        @keyframes pulsate { 0%{transform:scale(1);opacity:0.8} 100%{transform:scale(2.2);opacity:0} }
-
-        footer {
-            text-align: center; padding: 2rem; margin-top: 2rem;
-            color: #555; font-size: 0.85rem; border-top: 1px solid #1a1a24;
-        }
-    </style>
-</head>
-<body>
-
-<!-- ===== TYPEWRITER LOADER ===== -->
-<div class="loader-overlay" id="loader">
-
-    <div class="typewriter-area">
-        <div><span class="type-line line1" id="line1">> Ініціалізація...</span></div>
-        <div style="margin-top: 10px;"><span class="type-line line2" id="line2">> Створено за допомогою ШІ</span></div>
-    </div>
-
-    <div class="loader-logos">
-        <!-- Gemini sparkle -->
-        <div class="loader-logo-item gemini-logo">
-            <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-                <path class="gemini-path" d="M24 4 C24 4, 28 20, 44 24 C44 24, 28 28, 24 44 C24 44, 20 28, 4 24 C4 24, 20 20, 24 4Z"/>
-                <path class="gemini-fill" d="M24 4 C24 4, 28 20, 44 24 C44 24, 28 28, 24 44 C24 44, 20 28, 4 24 C4 24, 20 20, 24 4Z"/>
-            </svg>
-            <span>Gemini</span>
-        </div>
-
-        <span class="logo-amp">&</span>
-
-        <!-- Antigravity arrow-up -->
-        <div class="loader-logo-item agy-logo">
-            <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-                <path class="agy-path" d="M24 6 L38 36 L32 36 L24 18 L16 36 L10 36 Z"/>
-                <path class="agy-fill" d="M24 6 L38 36 L32 36 L24 18 L16 36 L10 36 Z"/>
-                <line class="agy-path" x1="15" y1="29" x2="33" y2="29" style="stroke-width:2.5"/>
-            </svg>
-            <span>Antigravity</span>
-        </div>
-    </div>
-
-    <div class="loader-bottom-bar"></div>
-</div>
-
-<!-- ===== HEADER ===== -->
-<header>
-    <div class="nav-container">
-        <a href="index.html" class="logo">Кирилюк<span>.Микола</span></a>
-        <nav>
-            <ul>
-                <li><a href="index.html" class="active">Головна</a></li>
-                <li><a href="git.html">Робота з Git</a></li>
-                <li><a href="bash.html">Команди Bash</a></li>
-            </ul>
-        </nav>
-    </div>
-</header>
-
-<!-- ===== CONTENT ===== -->
-<div class="container">
-    <div class="hero">
-        <h1>Звіт про вивчення систем <em>контролю версій</em></h1>
-        <p>Цей веб-ресурс створено для демонстрації практичних навичок роботи з розподіленою системою контролю версій Git та командним інтерфейсом.</p>
-        <p>Оберіть потрібний розділ у меню або скористайтеся кнопками нижче.</p>
-
-        <div class="btn-container">
-            <a href="git.html" class="btn">Вивчити Git</a>
-            <a href="bash.html" class="btn btn-alt">Шпаргалка Bash</a>
-        </div>
-
-        <div class="ai-badge">
-            <span class="pulse"></span>
-            Створено за допомогою штучного інтелекту
-        </div>
-    </div>
-</div>
-
-<footer>&copy; 2025 Кирилюк Микола — Усі права захищено</footer>
-
-<script>
-    // Remove cursor from line after it finishes typing
-    const line1 = document.getElementById('line1');
-    const line2 = document.getElementById('line2');
-
-    line1.addEventListener('animationend', (e) => {
-        if (e.animationName === 'type-line1') line1.classList.add('done');
-    });
-    line2.addEventListener('animationend', (e) => {
-        if (e.animationName === 'type-line2') line2.classList.add('done');
-    });
-
-    // Hide loader after all animations complete
-    window.addEventListener('load', () => {
-        setTimeout(() => {
-            document.getElementById('loader').classList.add('hidden');
-            document.body.classList.add('loaded');
-        }, 5200);
-    });
-</script>
-
-</body>
-</html>
+            width: 9px; height: 1.15em;
