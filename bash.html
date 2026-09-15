@@ -11,6 +11,10 @@
         body {
             font-family: 'Inter', 'Segoe UI', sans-serif;
             line-height: 1.7; background-color: #0f0f15; color: #e0e0e6;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            line-height: 1.7;
+            background-color: #0f0f15;
+            color: #e0e0e6;
             padding-top: 70px;
         }
         body::before {
@@ -24,21 +28,25 @@
         header {
             position: fixed; top: 0; left: 0; width: 100%;
             background: rgba(13,13,18,0.92); backdrop-filter: blur(14px);
-        nav a:hover, nav a.active { color: #fff; }
-        nav a:hover::after, nav a.active::after { width: 100%; }
-        /* CONTENT */
-        .container { max-width: 900px; margin: 0 auto; padding: 2rem; }
-        section {
-        p { color: #c0c0c8; }
-        strong { color: #fff; }
-        /* COMMAND TABLE */
-        .command-table {
-            width: 100%; border-collapse: separate;
-            border-spacing: 0; margin-top: 1.5rem;
-            font-weight: 700; margin-right: 8px; flex-shrink: 0;
+            border-bottom: 2px solid #f05032; z-index: 1000;
+            background: rgba(13,13,18,0.95);
+            border-bottom: 2px solid #f05032;
+            z-index: 1000;
         }
-        /* AI BADGE */
-        .ai-badge {
-            display: inline-flex; align-items: center; gap: 8px;
-            margin-top: 1.5rem; padding: 8px 18px;
-            background: rgba(139,233,253,0.08);
+        .nav-container {
+            max-width: 1000px; margin: 0 auto;
+            display: flex; justify-content: space-between;
+            align-items: center; padding: 0.8rem 2rem;
+        }
+        .logo {
+            font-size: 1.4rem; font-weight: 800; letter-spacing: -0.5px;
+        .logo-link {
+            font-size: 1.4rem; font-weight: 800;
+            text-decoration: none; color: #fff;
+        }
+        .logo span { color: #f05032; }
+        .logo:hover { text-decoration: none; }
+        .logo-link span { color: #f05032; }
+        nav ul { list-style: none; display: flex; gap: 24px; }
+        nav ul li { background: none; border: none; padding: 0; margin: 0; }
+        nav li { padding: 0; margin: 0; }
