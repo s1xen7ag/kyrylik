@@ -13,14 +13,34 @@
            ======================================== */
         .loader-overlay {
             position: fixed; inset: 0; z-index: 9999;
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            line-height: 1.7;
+            background-color: #0f0f15;
+            color: #e0e0e6;
+            padding-top: 70px;
+        }
+        /* ===== LOADER ===== */
+        #loader {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: 99999;
             background: #000;
             display: flex; flex-direction: column;
             align-items: center; justify-content: center;
             opacity: 1;
             transition: opacity 0.9s ease, visibility 0.9s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.8s ease;
         }
         .loader-overlay.hidden {
             opacity: 0; visibility: hidden; pointer-events: none;
+        #loader.fade-out {
+            opacity: 0;
+            pointer-events: none;
         }
         /* If loader should be skipped entirely */
         .loader-overlay.skip {
@@ -28,22 +48,4 @@
         }
         /* Typewriter */
         .typewriter-area {
-            letter-spacing: 2px; text-transform: uppercase;
-        }
-        /* Gemini */
-        .gemini-logo .label { color: #8be9fd; }
-        .gemini-logo svg { width: 42px; height: 42px; }
-        .gemini-draw {
-            fill: none; stroke: #8be9fd; stroke-width: 1.5;
-            stroke-dasharray: 250; stroke-dashoffset: 250;
-            transition: stroke-dashoffset 1.2s ease;
-        /*
-           ЛОГО — КАРТИНКИ
-           Поклади файли в ту ж папку що й index.html:
-             • gemini-logo.png   — лого Google Gemini
-             • antigravity-logo.png — лого Antigravity
-        */
-        .loader-logo-item img {
-            width: 48px; height: 48px;
-            object-fit: contain;
-        }
+        #typewriter {
