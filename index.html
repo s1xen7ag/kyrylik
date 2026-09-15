@@ -3,216 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Команди Bash | Шпаргалка</title>
+    <title>Головна | Кирилюк Микола</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            font-family: 'Inter', 'Segoe UI', sans-serif;
-            line-height: 1.7; background-color: #0f0f15; color: #e0e0e6;
-            padding-top: 70px;
+        /* ========================================
+           LOADER — TYPEWRITER ON BLACK SCREEN
+           ======================================== */
+        .loader-overlay {
+            position: fixed; inset: 0; z-index: 9999;
+            background: #000;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            opacity: 1;
+            transition: opacity 0.9s ease, visibility 0.9s ease;
         }
-        body::before {
-            content: ''; position: fixed; inset: 0; z-index: -1;
-            background-image:
-                linear-gradient(rgba(240,80,50,0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(240,80,50,0.03) 1px, transparent 1px);
-            background-size: 60px 60px;
+        .loader-overlay.hidden {
+            opacity: 0; visibility: hidden; pointer-events: none;
         }
-
-        /* HEADER */
-        header {
-            position: fixed; top: 0; left: 0; width: 100%;
-            background: rgba(13,13,18,0.92); backdrop-filter: blur(14px);
-            border-bottom: 2px solid #f05032; z-index: 1000;
+        /* If loader should be skipped entirely */
+        .loader-overlay.skip {
+            display: none;
         }
-        .nav-container {
-            max-width: 1000px; margin: 0 auto;
-            display: flex; justify-content: space-between;
-            align-items: center; padding: 0.8rem 2rem;
+        /* Typewriter */
+        .typewriter-area {
+            letter-spacing: 2px; text-transform: uppercase;
         }
-        .logo {
-            font-size: 1.4rem; font-weight: 800; letter-spacing: -0.5px;
-            text-decoration: none; color: #fff;
+        /* Gemini */
+        .gemini-logo .label { color: #8be9fd; }
+        .gemini-logo svg { width: 42px; height: 42px; }
+        .gemini-draw {
+            fill: none; stroke: #8be9fd; stroke-width: 1.5;
+            stroke-dasharray: 250; stroke-dashoffset: 250;
+            transition: stroke-dashoffset 1.2s ease;
+        /*
+           ЛОГО — КАРТИНКИ
+           Поклади файли в ту ж папку що й index.html:
+             • gemini-logo.png   — лого Google Gemini
+             • antigravity-logo.png — лого Antigravity
+        */
+        .loader-logo-item img {
+            width: 48px; height: 48px;
+            object-fit: contain;
         }
-        .logo span { color: #f05032; }
-        .logo:hover { text-decoration: none; }
-        nav ul { list-style: none; display: flex; gap: 24px; }
-        nav ul li { background: none; border: none; padding: 0; margin: 0; }
-        nav a {
-            color: #b0b0b8; text-decoration: none; font-weight: 600;
-            font-size: 0.95rem; position: relative; transition: color 0.3s;
-        }
-        nav a::after {
-            content: ''; position: absolute; bottom: -4px; left: 0;
-            width: 0; height: 2px; background: #f05032;
-            transition: width 0.3s ease;
-        }
-        nav a:hover, nav a.active { color: #fff; }
-        nav a:hover::after, nav a.active::after { width: 100%; }
-
-        /* CONTENT */
-        .container { max-width: 900px; margin: 0 auto; padding: 2rem; }
-
-        section {
-            background: linear-gradient(145deg, #16161e 0%, #1c1c26 100%);
-            padding: 2rem 2.5rem; border-radius: 14px;
-            margin-bottom: 2rem; border: 1px solid #2a2a36;
-        }
-
-        h2 {
-            color: #f05032; margin-top: 0; font-weight: 700;
-            padding-bottom: 0.6rem; margin-bottom: 1rem;
-            border-bottom: 1px solid rgba(240,80,50,0.2);
-        }
-        p { color: #c0c0c8; }
-        strong { color: #fff; }
-
-        /* COMMAND TABLE */
-        .command-table {
-            width: 100%; border-collapse: separate;
-            border-spacing: 0; margin-top: 1.5rem;
-            border-radius: 10px; overflow: hidden;
-        }
-        .command-table th, .command-table td { padding: 14px 16px; text-align: left; }
-        .command-table thead th {
-            background: linear-gradient(135deg, #f05032, #d43f21);
-            color: #fff; font-weight: 700; font-size: 0.9rem;
-            text-transform: uppercase; letter-spacing: 0.5px;
-        }
-        .command-table tbody tr {
-            background: rgba(255,255,255,0.02); transition: background 0.2s;
-        }
-        .command-table tbody tr:hover { background: rgba(240,80,50,0.06); }
-        .command-table tbody tr:nth-child(even) { background: rgba(255,255,255,0.04); }
-        .command-table tbody tr:nth-child(even):hover { background: rgba(240,80,50,0.08); }
-        .command-table td { border-bottom: 1px solid #1e1e28; }
-        .command-table tbody tr:last-child td { border-bottom: none; }
-        .command-table td:first-child { width: 35%; }
-        code {
-            background: #0d0d12; color: #ff79c6;
-            padding: 4px 8px; border-radius: 5px;
-            font-family: 'Fira Code', 'Courier New', monospace;
-            font-size: 0.85rem; border: 1px solid #2a2a36;
-        }
-        .cmd-num {
-            display: inline-flex; align-items: center; justify-content: center;
-            width: 22px; height: 22px; border-radius: 50%;
-            background: #50fa7b; color: #0d0d12; font-size: 0.7rem;
-            font-weight: 700; margin-right: 8px; flex-shrink: 0;
-        }
-
-        /* AI BADGE */
-        .ai-badge {
-            display: inline-flex; align-items: center; gap: 8px;
-            margin-top: 1.5rem; padding: 8px 18px;
-            background: rgba(139,233,253,0.08);
-            border: 1px solid rgba(139,233,253,0.2);
-            border-radius: 20px; font-size: 0.82rem;
-            color: #8be9fd; font-weight: 500;
-        }
-        .ai-badge .pulse {
-            width: 8px; height: 8px; border-radius: 50%;
-            background: #8be9fd; position: relative;
-        }
-        .ai-badge .pulse::after {
-            content: ''; position: absolute; inset: -3px;
-            border-radius: 50%; border: 1px solid #8be9fd;
-            animation: pulsate 1.8s ease-out infinite;
-        }
-        @keyframes pulsate { 0%{transform:scale(1);opacity:0.8} 100%{transform:scale(2.2);opacity:0} }
-
-        footer {
-            text-align: center; padding: 2rem; margin-top: 1rem;
-            color: #555; font-size: 0.85rem; border-top: 1px solid #1a1a24;
-        }
-    </style>
-</head>
-<body>
-
-<header>
-    <div class="nav-container">
-        <a href="index.html" class="logo">Кирилюк<span>.Микола</span></a>
-        <nav>
-            <ul>
-                <li><a href="index.html">Головна</a></li>
-                <li><a href="git.html">Робота з Git</a></li>
-                <li><a href="bash.html" class="active">Команди Bash</a></li>
-            </ul>
-        </nav>
-    </div>
-</header>
-
-<div class="container">
-
-    <section>
-        <h2>Шпаргалка базових команд Bash</h2>
-        <p>Нижче наведено список із 10 найважливіших команд для навігації та роботи з файлами у терміналі Bash:</p>
-
-        <table class="command-table">
-            <thead>
-                <tr>
-                    <th>Команда</th>
-                    <th>Що вона виконує</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><span class="cmd-num">1</span><code>pwd</code></td>
-                    <td>Виводить повний шлях до поточної робочої директорії.</td>
-                </tr>
-                <tr>
-                    <td><span class="cmd-num">2</span><code>ls</code></td>
-                    <td>Показує список файлів та папок у поточній директорії.</td>
-                </tr>
-                <tr>
-                    <td><span class="cmd-num">3</span><code>cd &lt;шлях&gt;</code></td>
-                    <td>Переходить до вказаної директорії (папки).</td>
-                </tr>
-                <tr>
-                    <td><span class="cmd-num">4</span><code>mkdir &lt;ім'я&gt;</code></td>
-                    <td>Створює нову директорію із зазначеним ім'ям.</td>
-                </tr>
-                <tr>
-                    <td><span class="cmd-num">5</span><code>touch &lt;файл&gt;</code></td>
-                    <td>Створює новий порожній файл або оновлює дату модифікації існуючого.</td>
-                </tr>
-                <tr>
-                    <td><span class="cmd-num">6</span><code>cat &lt;файл&gt;</code></td>
-                    <td>Виводить вміст файлу безпосередньо у термінал.</td>
-                </tr>
-                <tr>
-                    <td><span class="cmd-num">7</span><code>cp &lt;звідки&gt; &lt;куди&gt;</code></td>
-                    <td>Копіює файл або директорію з одного місця в інше.</td>
-                </tr>
-                <tr>
-                    <td><span class="cmd-num">8</span><code>mv &lt;звідки&gt; &lt;куди&gt;</code></td>
-                    <td>Переміщує або перейменовує файл чи директорію.</td>
-                </tr>
-                <tr>
-                    <td><span class="cmd-num">9</span><code>rm &lt;файл&gt;</code></td>
-                    <td>Видаляє файл. З прапорцем <code>-r</code> видаляє директорію рекурсивно.</td>
-                </tr>
-                <tr>
-                    <td><span class="cmd-num">10</span><code>echo "текст"</code></td>
-                    <td>Виводить текст у термінал або записує його у файл через перенаправлення.</td>
-                </tr>
-            </tbody>
-        </table>
-    </section>
-
-    <div style="text-align:center;">
-        <div class="ai-badge">
-            <span class="pulse"></span>
-            Створено за допомогою штучного інтелекту
-        </div>
-    </div>
-
-</div>
-
-<footer>&copy; 2025 Кирилюк Микола — Усі права захищено</footer>
-
-</body>
-</html>
