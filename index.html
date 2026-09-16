@@ -213,12 +213,23 @@
 <footer>&copy; 2025 Кирилюк Микола</footer>
 
 <script>
-// Якщо loader вже був — одразу прибираємо
 var loader = document.getElementById('loader');
-if (localStorage.getItem('loaderDone')) {
+
+// Визначаємо: чи прийшов з іншої сторінки цього ж сайту?
+var fromSameSite = document.referrer && document.referrer.indexOf(location.hostname) !== -1;
+
+// Визначаємо: чи це F5 (перезавантаження)?
+var isReload = false;
+try {
+    var nav = performance.getEntriesByType('navigation');
+    if (nav.length > 0) isReload = nav[0].type === 'reload';
+} catch(e) {}
+
+// Показуємо loader при F5 або першому відвідуванні
+// Ховаємо при переході з git.html / bash.html
+if (fromSameSite && !isReload) {
     loader.style.display = 'none';
 } else {
-    // Typewriter
     var lines = [
         { text: 'Завантаження...' },
         { text: 'Ініціалізація компонентів...' },
@@ -269,7 +280,6 @@ if (localStorage.getItem('loaderDone')) {
             setTimeout(function() { logos.classList.add('show'); }, 300);
             setTimeout(function() {
                 loader.classList.add('fade-out');
-                localStorage.setItem('loaderDone', '1');
                 setTimeout(function() { loader.style.display = 'none'; }, 900);
             }, 2200);
         }
