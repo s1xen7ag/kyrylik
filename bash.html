@@ -1,0 +1,3321 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="GNU/Linux: коротка інформація про ОС, популярні дистрибутиви, приклади команд терміналу, Bash-скрипт авторизації та інтерактивний демо-термінал.">
+    <meta name="theme-color" content="#0f0f15">
+    <meta name="color-scheme" content="dark">
+    <title>Linux та Bash | Довідник</title>
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        /* Палітра сайту (ті самі кольори, що й на головній та сторінці Git) */
+        :root {
+            --bg: #0f0f15;
+            --panel-a: #16161e;
+            --panel-b: #1c1c26;
+            --border: #2a2a36;
+            --line: #1e1e28;
+            --text: #e0e0e6;
+            --text-soft: #c0c0c8;
+            --muted: #9a9aa6;
+            --accent: #f05032;
+            --accent-dark: #d43f21;
+            --code-bg: #0d0d12;
+            --pink: #ff79c6;
+            --green: #50fa7b;
+            --cyan: #8be9fd;
+            --yellow: #f1fa8c;
+            --purple: #bd93f9;
+            --orange: #ffb86c;
+            --red: #ff6e6e;
+            --comment: #7b86b8;
+            --mono: ui-monospace, 'Cascadia Mono', Consolas, 'DejaVu Sans Mono', 'Courier New', monospace;
+        }
+
+        [hidden] { display: none !important; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            line-height: 1.7;
+            background-color: var(--bg);
+            color: var(--text);
+        }
+
+        /* ===== HEADER (як на інших сторінках) ===== */
+        header {
+            position: sticky; top: 0; width: 100%;
+            background: rgba(13,13,18,0.95);
+            border-bottom: 2px solid var(--accent);
+            z-index: 1000;
+        }
+        .nav-container {
+            max-width: 1000px; margin: 0 auto;
+            display: flex; justify-content: space-between;
+            align-items: center; padding: 0.8rem 2rem;
+        }
+        .logo-link {
+            font-size: 1.4rem; font-weight: 800;
+            text-decoration: none; color: #fff;
+        }
+        .logo-link span { color: var(--accent); }
+        header nav ul { list-style: none; display: flex; gap: 24px; }
+        header nav li { padding: 0; margin: 0; }
+        header nav a {
+            color: #b0b0b8; text-decoration: none; font-weight: 600;
+            font-size: 0.95rem; transition: color 0.3s;
+        }
+        header nav a:hover, header nav a.active { color: #fff; }
+
+        /* ===== ЗАГАЛЬНІ СТИЛІ КОНТЕНТУ ===== */
+        .container { max-width: 1000px; margin: 0 auto; padding: 2rem; }
+
+        section {
+            background: linear-gradient(145deg, var(--panel-a), var(--panel-b));
+            padding: 2rem 2.5rem; border-radius: 14px;
+            margin-bottom: 2rem; border: 1px solid var(--border);
+            scroll-margin-top: 90px;
+        }
+        h2 {
+            color: var(--accent); margin-top: 0; font-weight: 700;
+            padding-bottom: 0.6rem; margin-bottom: 1rem;
+            border-bottom: 1px solid rgba(240,80,50,0.2);
+            display: flex; align-items: baseline; gap: 12px;
+        }
+        .h-num {
+            font-family: var(--mono); font-size: 0.8rem; font-weight: 700;
+            color: #7a7a88; letter-spacing: 1px;
+        }
+        h3 { color: #fff; font-size: 1.05rem; font-weight: 700; margin: 1.8rem 0 0.8rem; }
+        p { color: var(--text-soft); }
+        p + p { margin-top: 0.8rem; }
+        strong { color: #fff; }
+        em { font-style: normal; color: #fff; }
+
+        section a { color: var(--green); text-decoration: none; }
+        section a:hover { color: var(--cyan); text-decoration: underline; }
+
+        a:focus-visible, button:focus-visible {
+            outline: 2px solid var(--cyan); outline-offset: 2px; border-radius: 4px;
+        }
+
+        code {
+            background: var(--code-bg); color: var(--pink);
+            padding: 2px 7px; border-radius: 5px;
+            font-family: var(--mono); font-size: 0.85em;
+        }
+        kbd {
+            font-family: var(--mono); font-size: 0.78rem; font-weight: 700;
+            color: #fff; background: #22222d;
+            border: 1px solid #3a3a46; border-bottom-width: 3px;
+            border-radius: 5px; padding: 0 7px;
+        }
+
+        /* Список з зеленою смугою (як на сторінці Git) */
+        .check-list { list-style: none; }
+        .check-list li {
+            padding: 10px 14px; margin-bottom: 6px;
+            background: rgba(255,255,255,0.03);
+            border-left: 3px solid var(--green);
+            border-radius: 0 6px 6px 0;
+            color: var(--text-soft);
+        }
+        .check-list li:hover { background: rgba(80,250,123,0.06); }
+
+        .two-col { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.6rem; }
+        .note { font-size: 0.86rem; color: var(--muted); margin-top: 1rem; }
+
+        /* ===== ВІКНА ТЕРМІНАЛУ ТА ФРАГМЕНТИ КОДУ ===== */
+        .window {
+            background: var(--code-bg); border: 1px solid var(--border);
+            border-radius: 10px; overflow: hidden;
+        }
+        .window-bar {
+            display: flex; align-items: center; gap: 12px;
+            min-height: 40px; padding: 7px 12px;
+            background: #14141b; border-bottom: 1px solid var(--border);
+        }
+        .dots { display: inline-flex; gap: 6px; flex-shrink: 0; }
+        .dots i { width: 11px; height: 11px; border-radius: 50%; opacity: 0.85; }
+        .dots i:nth-child(1) { background: var(--accent); }
+        .dots i:nth-child(2) { background: var(--yellow); }
+        .dots i:nth-child(3) { background: var(--green); }
+        .window-title {
+            font-family: var(--mono); font-size: 0.8rem; color: #8a8a96;
+            min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+        .bar-actions { margin-left: auto; display: flex; gap: 6px; flex-shrink: 0; }
+        .btn-sm {
+            font: inherit; font-size: 0.78rem; font-weight: 600;
+            color: var(--text-soft); background: #22222d;
+            border: 1px solid var(--border); border-radius: 6px;
+            padding: 3px 10px; cursor: pointer;
+            transition: color 0.2s, border-color 0.2s;
+        }
+        .btn-sm:hover { color: #fff; border-color: var(--accent); }
+        .btn-sm.done { color: var(--green); border-color: var(--green); }
+
+        .snip {
+            font-family: var(--mono); font-size: 0.8125rem; line-height: 1.6;
+            color: var(--text); background: var(--code-bg);
+            padding: 14px 16px; border: 1px solid var(--border); border-radius: 10px;
+            white-space: pre; overflow-x: auto; tab-size: 8;
+        }
+        .window .snip { border: 0; border-radius: 0; }
+        /* Запрошення командного рядка: не копіюється разом з командою */
+        .snip .ps::before { content: "kyrylik@ubuntu"; color: var(--green); font-weight: 700; }
+        .snip .ps::after { content: ":" attr(data-p) "$ "; color: var(--cyan); font-weight: 700; }
+        .snip .o { color: #a4a4b0; }
+        .snip .cm { color: var(--comment); }
+        .snip .d { color: var(--cyan); font-weight: 700; }
+        .snip .x { color: var(--green); font-weight: 700; }
+        .snip .e { color: var(--red); }
+        .snip b { font-weight: 700; }
+        .t-cyan { color: var(--cyan); }
+        .t-green { color: var(--green); }
+        .t-red { color: var(--red); }
+        .blink {
+            display: inline-block; width: 0.6em; height: 1.15em;
+            background: var(--green); vertical-align: text-bottom;
+            animation: blink 1s step-end infinite;
+        }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        .snip, .code, .term-body, .anatomy-line { scrollbar-width: thin; scrollbar-color: #2e2e3a transparent; }
+        .snip::-webkit-scrollbar, .code::-webkit-scrollbar, .term-body::-webkit-scrollbar { width: 8px; height: 8px; }
+        .snip::-webkit-scrollbar-thumb, .code::-webkit-scrollbar-thumb, .term-body::-webkit-scrollbar-thumb {
+            background: #2e2e3a; border-radius: 4px;
+        }
+
+        /* ===== HERO ===== */
+        .hero {
+            display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+            gap: 2rem; align-items: center; padding: 2.5rem;
+        }
+        .eyebrow {
+            font-family: var(--mono); font-size: 0.78rem; font-weight: 700;
+            color: var(--green); letter-spacing: 1.5px; text-transform: uppercase;
+            margin-bottom: 0.6rem;
+        }
+        .hero h1 { color: #fff; font-size: 2.1rem; font-weight: 800; line-height: 1.2; margin-bottom: 1rem; }
+        .hero h1 em { color: var(--accent); }
+        .hero p { color: #999; }
+        .hero .snip { font-size: 0.85rem; }
+        .toc {
+            grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 7px;
+            padding-top: 1.5rem; border-top: 1px solid var(--border);
+        }
+        .toc a {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 5px 12px; border-radius: 999px;
+            border: 1px solid var(--border); background: rgba(255,255,255,0.03);
+            color: var(--text-soft); font-size: 0.86rem; font-weight: 600;
+            text-decoration: none; transition: color 0.2s, border-color 0.2s, background 0.2s;
+        }
+        .toc a span { font-family: var(--mono); font-size: 0.75rem; color: var(--accent); }
+        .toc a:hover { color: #fff; border-color: var(--accent); background: rgba(240,80,50,0.08); text-decoration: none; }
+
+        /* ===== 01. ПРО LINUX ===== */
+        .stack { display: grid; grid-template-columns: minmax(0, 1fr) 30px; gap: 6px 8px; }
+        .layer {
+            grid-column: 1; display: flex; flex-direction: column;
+            padding: 8px 12px; border-radius: 8px;
+            background: rgba(255,255,255,0.03); border-left: 3px solid var(--c);
+        }
+        .layer b { color: #fff; font-size: 0.92rem; }
+        .layer span { color: var(--muted); font-size: 0.8rem; line-height: 1.4; }
+        .l-user { --c: var(--pink); }
+        .l-apps { --c: var(--cyan); }
+        .l-gnu { --c: var(--green); background: rgba(80,250,123,0.06); }
+        .l-kernel { --c: var(--accent); background: rgba(240,80,50,0.08); }
+        .l-hw { --c: #6c6c7a; }
+        .stack-brace {
+            grid-column: 2; grid-row: 3 / 5;
+            display: flex; align-items: center; justify-content: center;
+            border: 2px solid var(--accent); border-left: 0; border-radius: 0 10px 10px 0;
+        }
+        .stack-brace span {
+            writing-mode: vertical-rl; transform: rotate(180deg);
+            font-family: var(--mono); font-size: 0.72rem; font-weight: 700;
+            color: var(--accent); letter-spacing: 1px;
+        }
+
+        .timeline { list-style: none; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); margin-top: 1.4rem; }
+        .timeline li { position: relative; padding: 18px 10px 0 0; border-top: 2px solid var(--border); }
+        .timeline li::before {
+            content: ""; position: absolute; top: -7px; left: 0;
+            width: 12px; height: 12px; border-radius: 50%;
+            background: var(--bg); border: 2px solid var(--accent);
+        }
+        .timeline time { display: block; font-family: var(--mono); font-weight: 700; color: var(--accent); }
+        .timeline p { font-size: 0.82rem; line-height: 1.45; color: #b0b0b8; }
+
+        /* ===== 02. ДИСТРИБУТИВИ ===== */
+        .f-deb { --f: var(--pink); }
+        .f-rh { --f: var(--accent); }
+        .f-arch { --f: var(--cyan); }
+        .f-suse { --f: var(--green); }
+        .families { list-style: none; display: flex; flex-wrap: wrap; gap: 8px 22px; margin: 1.2rem 0 1.4rem; }
+        .families li { display: inline-flex; align-items: center; gap: 8px; font-size: 0.88rem; color: var(--text-soft); }
+        .families li::before { content: ""; width: 10px; height: 10px; border-radius: 3px; background: var(--f); flex-shrink: 0; }
+        .families b { color: #fff; }
+
+        .distro-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 14px; }
+        .distro {
+            display: flex; flex-direction: column; gap: 8px;
+            padding: 14px 16px 16px; border-radius: 10px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border); border-top: 3px solid var(--f);
+            transition: transform 0.2s, background 0.2s;
+        }
+        .distro:hover { transform: translateY(-2px); background: rgba(255,255,255,0.05); }
+        .distro-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+        .distro h3 { margin: 0; font-size: 1rem; line-height: 1.3; }
+        .year { font-family: var(--mono); font-size: 0.75rem; color: var(--muted); }
+        .distro p { font-size: 0.85rem; line-height: 1.55; flex: 1; }
+        .distro-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+        .fam-chip {
+            font-size: 0.72rem; font-weight: 700; color: var(--f);
+            border: 1px solid var(--f); border-radius: 999px; padding: 0 8px;
+        }
+        .distro-meta code { font-size: 0.75rem; }
+        .for { font-size: 0.78rem; color: var(--muted); line-height: 1.4; }
+
+        /* ===== 03. КОМАНДИ ===== */
+        .anatomy {
+            margin: 1.2rem 0 0.4rem; padding: 16px 18px;
+            background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px;
+        }
+        .anatomy-line {
+            font-family: var(--mono); font-size: 1.15rem; font-weight: 700;
+            white-space: nowrap; overflow-x: auto; margin-bottom: 10px;
+        }
+        .anatomy-legend { list-style: none; display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 0.84rem; color: var(--muted); }
+        .anatomy-legend > li > span:first-child { font-family: var(--mono); font-weight: 700; margin-right: 4px; }
+        .a-user { color: var(--green); }
+        .a-path { color: var(--cyan); }
+        .a-sign { color: #fff; }
+        .a-cmd { color: var(--pink); }
+        .a-opt { color: var(--orange); }
+        .a-arg { color: var(--yellow); }
+
+        .cmd-row {
+            display: grid; grid-template-columns: minmax(0, 0.42fr) minmax(0, 0.58fr);
+            gap: 22px; align-items: start;
+            padding: 24px 0; border-top: 1px solid var(--line);
+        }
+        .cmd-row:first-child { border-top: 0; }
+        .cmd-row h3 {
+            margin: 0 0 6px; display: flex; align-items: center; flex-wrap: wrap;
+            gap: 4px 10px; font-size: 1.05rem;
+        }
+        .cmd-row h3 code { font-size: 1rem; padding: 2px 10px; }
+        .cmd-row h3 small { font-family: var(--mono); font-size: 0.75rem; font-weight: 400; color: var(--muted); }
+        .cmd-num {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0;
+            background: var(--green); color: #0d0d12;
+            font-size: 0.72rem; font-weight: 700;
+        }
+        .cmd-row p { font-size: 0.92rem; }
+        .opts { list-style: none; margin-top: 10px; display: grid; gap: 5px; }
+        .opts li {
+            font-size: 0.85rem; line-height: 1.5; color: var(--text-soft);
+            padding-left: 12px; border-left: 2px solid #33333f;
+        }
+        .opts code { font-size: 0.8rem; }
+        .warn {
+            margin-top: 10px; padding: 9px 12px; border-radius: 8px;
+            background: rgba(240,80,50,0.08); border: 1px solid rgba(240,80,50,0.35);
+            color: #f3b3a6; font-size: 0.85rem; line-height: 1.5;
+        }
+
+        .keys { margin-top: 0.6rem; padding-top: 0.4rem; border-top: 1px solid var(--line); }
+        .keys ul { list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 8px 20px; }
+        .keys li { font-size: 0.88rem; line-height: 1.9; color: var(--text-soft); }
+
+        /* ===== 04. СКРИПТ ===== */
+        .tags { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; margin: 1rem 0 1.3rem; }
+        .tags li {
+            font-size: 0.8rem; font-weight: 600; color: var(--green);
+            background: rgba(80,250,123,0.07); border: 1px solid rgba(80,250,123,0.25);
+            border-radius: 999px; padding: 2px 12px;
+        }
+        .code {
+            padding: 14px 0; font-family: var(--mono); font-size: 0.8125rem; line-height: 1.6;
+            color: var(--text); overflow-x: auto; counter-reset: ln; tab-size: 4;
+        }
+        .code code {
+            display: block; background: none; padding: 0 18px; border-radius: 0;
+            color: inherit; font-size: inherit; white-space: pre;
+        }
+        .code code.hl { padding: 0; }
+        .code .ln { display: block; position: relative; min-height: 1.6em; padding: 0 18px 0 3.8em; }
+        .code .ln::before {
+            counter-increment: ln; content: counter(ln);
+            position: absolute; left: 0; width: 2.6em; text-align: right;
+            color: #4c4c5c; user-select: none;
+        }
+        .code .ln:hover { background: rgba(255,255,255,0.025); }
+        .hl-cm { color: var(--comment); font-style: italic; }
+        .hl-str { color: var(--yellow); }
+        .hl-var { color: var(--purple); }
+        .hl-kw { color: var(--pink); }
+        .hl-cmd { color: var(--cyan); }
+        .hl-fn { color: var(--green); }
+        .hl-num, .hl-flag { color: var(--orange); }
+
+        .script-cta {
+            display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+            gap: 12px 20px; margin-top: 16px;
+        }
+        .btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            font: inherit; font-weight: 700; font-size: 0.95rem;
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            color: #fff; padding: 11px 24px; border: 0; border-radius: 8px; cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.3s;
+            box-shadow: 0 4px 18px rgba(240,80,50,0.25);
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(240,80,50,0.4); }
+
+        .steps { counter-reset: st; list-style: none; display: grid; gap: 8px; }
+        .steps li {
+            counter-increment: st; position: relative;
+            padding: 10px 14px 10px 50px; border-radius: 8px;
+            background: rgba(255,255,255,0.03); color: var(--text-soft);
+        }
+        .steps li::before {
+            content: counter(st); position: absolute; left: 13px; top: 11px;
+            width: 24px; height: 24px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            color: #fff; font-size: 0.75rem; font-weight: 700;
+        }
+        .demo-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+
+        .command-table { width: 100%; border-collapse: collapse; }
+        .command-table th, .command-table td {
+            padding: 11px 16px; text-align: left; vertical-align: top;
+            border-bottom: 1px solid var(--line);
+        }
+        .command-table th {
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            color: #fff; font-weight: 700; font-size: 0.85rem;
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .command-table th:first-child { border-radius: 8px 0 0 0; }
+        .command-table th:last-child { border-radius: 0 8px 0 0; }
+        .command-table td { font-size: 0.92rem; color: var(--text-soft); }
+        .command-table td:first-child { width: 34%; }
+        .command-table tr:hover td { background: rgba(240,80,50,0.06); }
+
+        /* ===== 05. ДЕМО-ТЕРМІНАЛ ===== */
+        .term { margin-top: 1.2rem; transition: border-color 0.2s, box-shadow 0.2s; }
+        .term:focus-within { border-color: #3a3a4a; box-shadow: 0 0 0 1px rgba(80,250,123,0.3); }
+        .term-body {
+            height: 420px; overflow-y: auto; overscroll-behavior: contain;
+            padding: 12px 16px 16px; cursor: text;
+            font-family: var(--mono); font-size: 0.875rem; line-height: 1.55; color: #c8c8d0;
+        }
+        .term-out { white-space: pre-wrap; overflow-wrap: anywhere; tab-size: 8; }
+        .t-line { min-height: 1.55em; }
+        .t-grid { display: grid; }
+        .t-grid span { white-space: pre; overflow: hidden; text-overflow: ellipsis; }
+        .term-line { display: flex; flex-wrap: wrap; align-items: baseline; }
+        .term-prompt { white-space: pre-wrap; overflow-wrap: anywhere; cursor: text; }
+        .term-input {
+            flex: 1 1 12ch; min-width: 12ch; padding: 0;
+            background: transparent; border: 0; outline: none;
+            font: inherit; color: #fff; caret-color: var(--green);
+        }
+        .term-input.secret { color: transparent; caret-color: transparent; }
+        .term-input.secret::selection { color: transparent; background: transparent; }
+        .term-cursor {
+            display: inline-block; width: 0.6em; height: 1.1em; align-self: center;
+            background: var(--green); animation: blink 1s step-end infinite;
+        }
+        .pu { color: var(--green); font-weight: 700; }
+        .pp { color: var(--cyan); font-weight: 700; }
+        .tc { color: #fff; }
+        .err { color: var(--red); }
+        .dim { color: #7a7a88; }
+        .dir { color: var(--cyan); font-weight: 700; }
+        .exe { color: var(--green); font-weight: 700; }
+        .b { font-weight: 700; }
+        .c-cyan { color: var(--cyan); }
+        .c-green { color: var(--green); }
+        .c-red { color: var(--red); }
+        .c-yellow { color: var(--yellow); }
+
+        .chips { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 14px; }
+        .chips-label { font-size: 0.82rem; color: var(--muted); margin-right: 2px; }
+        .chips button {
+            font-family: var(--mono); font-size: 0.78rem; color: var(--pink);
+            background: var(--code-bg); border: 1px solid var(--border); border-radius: 6px;
+            padding: 3px 10px; cursor: pointer; transition: border-color 0.2s, color 0.2s;
+        }
+        .chips button:hover { border-color: var(--pink); }
+        .chips button.run { color: var(--green); }
+        .chips button.run:hover { border-color: var(--green); }
+
+        /* ===== 06. ДЖЕРЕЛА ===== */
+        .src-groups { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.4rem; }
+        .src-groups h3 { margin: 0 0 0.8rem; font-size: 0.95rem; }
+        .src-list { list-style: none; display: grid; gap: 8px; }
+        .src-list li {
+            display: flex; flex-direction: column;
+            padding: 9px 14px; border-radius: 0 6px 6px 0;
+            background: rgba(255,255,255,0.03); border-left: 3px solid var(--green);
+        }
+        .src-list li:hover { background: rgba(80,250,123,0.06); }
+        .src-list a { font-weight: 600; font-size: 0.92rem; line-height: 1.5; }
+        .src-list span { font-size: 0.8rem; line-height: 1.45; color: var(--muted); }
+
+        footer {
+            text-align: center; padding: 2rem; margin-top: 1rem;
+            color: #555; font-size: 0.85rem;
+            border-top: 1px solid #1a1a24;
+        }
+
+        /* ===== АДАПТИВНІСТЬ ===== */
+        @media (max-width: 940px) {
+            .cmd-row { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+            .demo-grid { grid-template-columns: minmax(0, 1fr); }
+        }
+        @media (max-width: 860px) {
+            .hero, .two-col, .src-groups { grid-template-columns: minmax(0, 1fr); }
+            .timeline { grid-template-columns: minmax(0, 1fr); margin-left: 6px; border-left: 2px solid var(--border); }
+            .timeline li { border-top: 0; padding: 0 0 12px 22px; }
+            .timeline li::before { top: 7px; left: -8px; }
+            .timeline time { display: inline; margin-right: 8px; }
+            .timeline p { display: inline; font-size: 0.9rem; }
+        }
+        @media (max-width: 640px) {
+            .nav-container { flex-direction: column; gap: 2px; padding: 0.6rem 1rem; }
+            .logo-link { font-size: 1.2rem; }
+            header nav ul { gap: 16px; flex-wrap: wrap; justify-content: center; }
+            header nav a { font-size: 0.86rem; }
+            .container { padding: 1rem; }
+            section { padding: 1.5rem 1.1rem; margin-bottom: 1.2rem; scroll-margin-top: 110px; }
+            .hero { padding: 1.6rem 1.2rem; gap: 1.4rem; }
+            .hero h1 { font-size: 1.6rem; }
+            h2 { font-size: 1.3rem; }
+            .anatomy { padding: 14px; }
+            .anatomy-line { font-size: 0.85rem; }
+            .snip { font-size: 0.75rem; padding: 12px 13px; }
+            .window-bar .dots { display: none; }
+            .term-body { height: 360px; padding: 10px 12px 14px; font-size: 0.8rem; }
+            .command-table th, .command-table td { padding: 9px 10px; }
+            .steps li { padding-left: 46px; }
+        }
+        @media (pointer: coarse) {
+            .term-input { font-size: 16px; }   /* iOS не збільшує сторінку під час введення */
+        }
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            *, *::before, *::after { animation: none !important; transition: none !important; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="nav-container">
+        <a href="index.html" class="logo-link">Кирилюк<span>.Микола</span></a>
+        <nav>
+            <ul>
+                <li><a href="index.html">Головна</a></li>
+                <li><a href="git.html">Робота з Git</a></li>
+                <li><a href="bash.html" class="active">Команди Bash</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<main class="container">
+
+    <!-- ===== HERO ===== -->
+    <section class="hero">
+        <div>
+            <div class="eyebrow">Тема: Linux і командний рядок</div>
+            <h1>Операційна система <em>GNU/Linux</em></h1>
+            <p>Коротко про ОС і популярні дистрибутиви, приклади команд терміналу, Bash-скрипт авторизації та демо-термінал, у якому все можна спробувати самостійно.</p>
+        </div>
+        <div class="window" aria-hidden="true">
+            <div class="window-bar">
+                <span class="dots"><i></i><i></i><i></i></span>
+                <span class="window-title">kyrylik@ubuntu: ~</span>
+            </div>
+<pre class="snip"><span class="ps" data-p="~"></span>uname -o
+<span class="o">GNU/Linux</span>
+<span class="ps" data-p="~"></span>echo $SHELL
+<span class="o">/bin/bash</span>
+<span class="ps" data-p="~"></span>whoami
+<span class="o">kyrylik</span>
+<span class="ps" data-p="~"></span><span class="blink"></span></pre>
+        </div>
+        <nav class="toc" aria-label="Зміст сторінки">
+            <a href="#linux"><span>01</span>GNU/Linux</a>
+            <a href="#distros"><span>02</span>Дистрибутиви</a>
+            <a href="#commands"><span>03</span>Команди CLI</a>
+            <a href="#script"><span>04</span>Bash-скрипт</a>
+            <a href="#terminal"><span>05</span>Демо-термінал</a>
+            <a href="#sources"><span>06</span>Джерела</a>
+        </nav>
+    </section>
+
+    <!-- ===== 01. ПРО GNU/LINUX ===== -->
+    <section id="linux">
+        <h2><span class="h-num">01</span>Що таке GNU/Linux</h2>
+        <p><strong>GNU/Linux</strong> — сімейство вільних Unix-подібних операційних систем з відкритим вихідним кодом. Назва поєднує дві складові: <strong>Linux</strong> — це <em>ядро</em>, яке керує процесором, пам'яттю, файлами та пристроями, а <strong>GNU</strong> — набір системних програм, що перетворюють ядро на повноцінну ОС: оболонка <code>bash</code>, компілятор <code>gcc</code>, базові утиліти <code>ls</code>, <code>cp</code>, <code>mv</code> та інші.</p>
+        <p>Проєкт GNU у 1983 році започаткував <strong>Річард Столлман</strong>, а ядро Linux у 1991 році написав фінський студент <strong>Лінус Торвальдс</strong>. Сьогодні Linux працює на більшості серверів і хмарних платформ, на всіх суперкомп'ютерах зі списку TOP500, у смартфонах на Android, роутерах, телевізорах та інших «розумних» пристроях.</p>
+
+        <div class="two-col">
+            <div>
+                <h3>Як влаштована система</h3>
+                <div class="stack">
+                    <div class="layer l-user"><b>Користувач</b><span>вводить команди, запускає програми</span></div>
+                    <div class="layer l-apps"><b>Прикладні програми</b><span>браузер, офісний пакет, редактор коду</span></div>
+                    <div class="layer l-gnu"><b>Оболонка Bash і утиліти GNU</b><span>bash, ls, cp, mv, grep, gcc…</span></div>
+                    <div class="layer l-kernel"><b>Ядро Linux</b><span>процеси, пам'ять, файлова система, драйвери</span></div>
+                    <div class="layer l-hw"><b>Апаратне забезпечення</b><span>процесор, оперативна пам'ять, диски, мережа</span></div>
+                    <div class="stack-brace" aria-hidden="true"><span>GNU/Linux</span></div>
+                </div>
+            </div>
+            <div>
+                <h3>Ключові особливості</h3>
+                <ul class="check-list">
+                    <li><strong>Вільна та відкрита.</strong> Код доступний кожному (ліцензія GNU GPL): систему можна безкоштовно використовувати, вивчати, змінювати й поширювати.</li>
+                    <li><strong>Багатокористувацька й багатозадачна.</strong> Одночасно працюють багато користувачів і процесів, кожен — зі своїми правами доступу.</li>
+                    <li><strong>Надійна й безпечна.</strong> Розмежування прав (звичайний користувач / root), регулярні оновлення, мінімум вірусів.</li>
+                    <li><strong>«Усе є файлом».</strong> Диски, пристрої та налаштування доступні як файли в єдиному дереві каталогів, що починається з кореня <code>/</code>.</li>
+                    <li><strong>Потужний термінал.</strong> Будь-яку дію можна виконати командою або автоматизувати скриптом.</li>
+                </ul>
+            </div>
+        </div>
+
+        <h3>Коротка історія</h3>
+        <ol class="timeline">
+            <li><time>1983</time><p>Річард Столлман оголошує проєкт <strong>GNU</strong></p></li>
+            <li><time>1991</time><p>Лінус Торвальдс публікує перше ядро <strong>Linux</strong></p></li>
+            <li><time>1992</time><p>Ядро переходить на ліцензію <strong>GNU GPL</strong></p></li>
+            <li><time>1993</time><p>З'являються <strong>Slackware</strong> і <strong>Debian</strong></p></li>
+            <li><time>2004</time><p>Виходить <strong>Ubuntu</strong> — Linux для всіх</p></li>
+            <li><time>2008</time><p>Перший смартфон на <strong>Android</strong> (ядро Linux)</p></li>
+            <li><time>2017</time><p><strong>Усі 500</strong> найпотужніших суперкомп'ютерів — на Linux</p></li>
+        </ol>
+    </section>
+
+    <!-- ===== 02. ДИСТРИБУТИВИ ===== -->
+    <section id="distros">
+        <h2><span class="h-num">02</span>Популярні дистрибутиви</h2>
+        <p><strong>Дистрибутив</strong> — це готова до встановлення операційна система: ядро Linux + утиліти GNU + менеджер пакетів + графічне середовище та набір програм. Дистрибутивів сотні, але більшість належить до кількох «родин» зі спільною основою та форматом пакетів:</p>
+
+        <ul class="families">
+            <li class="f-deb"><span><b>Debian</b> — пакети <code>.deb</code>, менеджер <code>apt</code></span></li>
+            <li class="f-rh"><span><b>Red Hat</b> — пакети <code>.rpm</code>, менеджер <code>dnf</code></span></li>
+            <li class="f-arch"><span><b>Arch</b> — менеджер <code>pacman</code>, rolling release</span></li>
+            <li class="f-suse"><span><b>SUSE</b> — пакети <code>.rpm</code>, менеджер <code>zypper</code></span></li>
+        </ul>
+
+        <div class="distro-grid">
+            <article class="distro f-deb">
+                <div class="distro-head"><h3>Ubuntu</h3><span class="year">2004</span></div>
+                <p>Найпопулярніший дистрибутив для ПК і серверів від компанії Canonical. Простий у встановленні, LTS-версії отримують оновлення щонайменше 5 років.</p>
+                <span class="for">Для новачків, розробників і серверів</span>
+                <div class="distro-meta"><span class="fam-chip">Debian</span><code>apt</code></div>
+            </article>
+            <article class="distro f-deb">
+                <div class="distro-head"><h3>Debian</h3><span class="year">1993</span></div>
+                <p>Один із найстаріших дистрибутивів, який повністю розвиває спільнота. Еталон стабільності й основа для сотень інших систем: Ubuntu, Mint, Kali.</p>
+                <span class="for">Для серверів і стабільних робочих станцій</span>
+                <div class="distro-meta"><span class="fam-chip">Debian</span><code>apt</code></div>
+            </article>
+            <article class="distro f-deb">
+                <div class="distro-head"><h3>Linux Mint</h3><span class="year">2006</span></div>
+                <p>Створений на базі Ubuntu. Звичний інтерфейс Cinnamon у стилі Windows і готовий набір програм одразу після встановлення.</p>
+                <span class="for">Для тих, хто переходить з Windows</span>
+                <div class="distro-meta"><span class="fam-chip">Debian</span><code>apt</code></div>
+            </article>
+            <article class="distro f-rh">
+                <div class="distro-head"><h3>Fedora</h3><span class="year">2003</span></div>
+                <p>Спільнотний дистрибутив за підтримки Red Hat. Першим отримує нові технології, які згодом потрапляють у RHEL.</p>
+                <span class="for">Для розробників і любителів новинок</span>
+                <div class="distro-meta"><span class="fam-chip">Red Hat</span><code>dnf</code></div>
+            </article>
+            <article class="distro f-arch">
+                <div class="distro-head"><h3>Arch Linux</h3><span class="year">2002</span></div>
+                <p>Мінімалістичний дистрибутив з постійними оновленнями (rolling release): систему збирають «під себе» з нуля. Славиться документацією Arch Wiki.</p>
+                <span class="for">Для досвідчених користувачів</span>
+                <div class="distro-meta"><span class="fam-chip">Arch</span><code>pacman</code></div>
+            </article>
+            <article class="distro f-rh">
+                <div class="distro-head"><h3>Red Hat Enterprise Linux</h3><span class="year">2002</span></div>
+                <p>Комерційна система для бізнесу: платна підтримка, сертифікації та 10-річний життєвий цикл. Стандарт корпоративних серверів.</p>
+                <span class="for">Для компаній і дата-центрів</span>
+                <div class="distro-meta"><span class="fam-chip">Red Hat</span><code>dnf</code></div>
+            </article>
+            <article class="distro f-suse">
+                <div class="distro-head"><h3>openSUSE</h3><span class="year">2005</span></div>
+                <p>Спільнотний дистрибутив за підтримки SUSE. Дві гілки: стабільна Leap і постійно оновлюваний Tumbleweed; зміни можна відкотити через знімки Btrfs.</p>
+                <span class="for">Для робочих станцій і серверів</span>
+                <div class="distro-meta"><span class="fam-chip">SUSE</span><code>zypper</code></div>
+            </article>
+            <article class="distro f-deb">
+                <div class="distro-head"><h3>Kali Linux</h3><span class="year">2013</span></div>
+                <p>Спеціалізований дистрибутив на базі Debian для кібербезпеки й тестування на проникнення: сотні попередньо встановлених інструментів.</p>
+                <span class="for">Для фахівців з кібербезпеки</span>
+                <div class="distro-meta"><span class="fam-chip">Debian</span><code>apt</code></div>
+            </article>
+        </div>
+        <p class="note">Також відомі: Manjaro, Pop!_OS, Zorin OS, elementary OS, Rocky Linux, AlmaLinux, Alpine Linux, Gentoo, Slackware. Актуальний рейтинг інтересу до дистрибутивів веде сайт <a href="https://distrowatch.com/" target="_blank" rel="noopener">DistroWatch</a>.</p>
+    </section>
+
+    <!-- ===== 03. КОМАНДИ LINUX CLI ===== -->
+    <section id="commands">
+        <h2><span class="h-num">03</span>Команди Linux CLI</h2>
+        <p><strong>CLI</strong> (Command Line Interface) — текстовий інтерфейс: користувач вводить команди в терміналі, а командна оболонка <strong>Bash</strong> їх виконує. Загальний вигляд команди: <code>команда [опції] [аргументи]</code>.</p>
+
+        <div class="anatomy">
+            <div class="anatomy-line" aria-hidden="true"><span class="a-user">kyrylik@ubuntu</span><span class="a-path">:~</span><span class="a-sign">$</span> <span class="a-cmd">ls</span> <span class="a-opt">-l</span> <span class="a-arg">Documents</span></div>
+            <ul class="anatomy-legend">
+                <li><span class="a-user">kyrylik@ubuntu</span> користувач@комп'ютер</li>
+                <li><span class="a-path">:~</span> поточний каталог (~ — домашній)</li>
+                <li><span class="a-sign">$</span> звичайний користувач (# — root)</li>
+                <li><span class="a-cmd">ls</span> команда</li>
+                <li><span class="a-opt">-l</span> опція (ключ)</li>
+                <li><span class="a-arg">Documents</span> аргумент</li>
+            </ul>
+        </div>
+
+        <div class="cmd-list">
+            <article class="cmd-row">
+                <div>
+                    <h3><span class="cmd-num">1</span><code>pwd</code><small>print working directory</small></h3>
+                    <p>Виводить повний (абсолютний) шлях до поточного каталогу — місця у файловій системі, де ви зараз працюєте.</p>
+                    <ul class="opts">
+                        <li><code>pwd -P</code> — фізичний шлях, без символьних посилань</li>
+                    </ul>
+                </div>
+<pre class="snip"><span class="ps" data-p="~"></span>pwd
+<span class="o">/home/kyrylik</span>
+<span class="ps" data-p="~"></span>cd Documents
+<span class="ps" data-p="~/Documents"></span>pwd
+<span class="o">/home/kyrylik/Documents</span></pre>
+            </article>
+
+            <article class="cmd-row">
+                <div>
+                    <h3><span class="cmd-num">2</span><code>echo</code><small>«відлуння»</small></h3>
+                    <p>Виводить текст або значення змінних на екран. Разом з операторами перенаправлення записує текст у файл.</p>
+                    <ul class="opts">
+                        <li><code>-n</code> — не переходити на новий рядок</li>
+                        <li><code>-e</code> — обробляти спецсимволи <code>\n</code>, <code>\t</code></li>
+                        <li><code>&gt;</code> — записати у файл (вміст буде перезаписано)</li>
+                        <li><code>&gt;&gt;</code> — дописати в кінець файлу</li>
+                    </ul>
+                </div>
+<pre class="snip"><span class="ps" data-p="~"></span>echo "Привіт, Linux!"
+<span class="o">Привіт, Linux!</span>
+<span class="ps" data-p="~"></span>echo "Я — $USER, оболонка $SHELL"
+<span class="o">Я — kyrylik, оболонка /bin/bash</span>
+<span class="ps" data-p="~"></span>echo "Перший рядок" &gt; notes.txt
+<span class="ps" data-p="~"></span>echo "Другий рядок" &gt;&gt; notes.txt
+<span class="ps" data-p="~"></span>cat notes.txt
+<span class="o">Перший рядок
+Другий рядок</span></pre>
+            </article>
+
+            <article class="cmd-row">
+                <div>
+                    <h3><span class="cmd-num">3</span><code>ls</code><small>list</small></h3>
+                    <p>Показує вміст каталогу: файли та підкаталоги. У рядку <code>drwxr-xr-x</code> літера <code>d</code> означає каталог, а <code>r</code>, <code>w</code>, <code>x</code> — права на читання, запис і виконання для власника, групи та інших.</p>
+                    <ul class="opts">
+                        <li><code>-l</code> — детальний список: права, власник, розмір, дата</li>
+                        <li><code>-a</code> — показати приховані файли (назва з крапки)</li>
+                        <li><code>-h</code> — розміри у зручному вигляді (K, M, G)</li>
+                        <li><code>-R</code> — рекурсивно, з усіма підкаталогами</li>
+                    </ul>
+                </div>
+<pre class="snip"><span class="ps" data-p="~"></span>ls
+<span class="d">Documents</span>  <span class="d">Downloads</span>  <span class="x">login.sh</span>  notes.txt
+<span class="ps" data-p="~"></span>ls -la
+<span class="o">total 32
+drwxr-x--- 4 kyrylik kyrylik 4096 Sep 24 10:15 <span class="d">.</span>
+drwxr-xr-x 3 root    root    4096 Sep  1 09:00 <span class="d">..</span>
+-rw-r--r-- 1 kyrylik kyrylik 3771 Sep  1 09:00 .bashrc
+drwxr-xr-x 2 kyrylik kyrylik 4096 Sep 20 18:30 <span class="d">Documents</span>
+drwxr-xr-x 2 kyrylik kyrylik 4096 Sep 20 18:30 <span class="d">Downloads</span>
+-rwxr-xr-x 1 kyrylik kyrylik 4058 Sep 24 10:12 <span class="x">login.sh</span>
+-rw-r--r-- 1 kyrylik kyrylik   48 Sep 24 10:14 notes.txt
+-rw-r--r-- 1 kyrylik kyrylik  807 Sep  1 09:00 .profile</span></pre>
+            </article>
+
+            <article class="cmd-row">
+                <div>
+                    <h3><span class="cmd-num">4</span><code>cd</code><small>change directory</small></h3>
+                    <p>Переходить в інший каталог. Шлях може бути абсолютним (від кореня <code>/</code>) або відносним (від поточного каталогу).</p>
+                    <ul class="opts">
+                        <li><code>cd</code> або <code>cd ~</code> — у домашній каталог</li>
+                        <li><code>cd ..</code> — на рівень вище</li>
+                        <li><code>cd -</code> — у попередній каталог</li>
+                        <li><code>cd /</code> — у кореневий каталог</li>
+                    </ul>
+                </div>
+<pre class="snip"><span class="ps" data-p="~"></span>cd Documents    <span class="cm"># відносний шлях</span>
+<span class="ps" data-p="~/Documents"></span>cd .. <span class="cm"># на рівень вище</span>
+<span class="ps" data-p="~"></span>cd /var/log     <span class="cm"># абсолютний шлях</span>
+<span class="ps" data-p="/var/log"></span>cd       <span class="cm"># додому (як cd ~)</span>
+<span class="ps" data-p="~"></span>cd -            <span class="cm"># у попередній каталог</span>
+<span class="o">/var/log</span>
+<span class="ps" data-p="/var/log"></span></pre>
+            </article>
+
+            <article class="cmd-row">
+                <div>
+                    <h3><span class="cmd-num">5</span><code>touch</code><small>«доторкнутися»</small></h3>
+                    <p>Створює новий порожній файл (розмір 0 байт). Якщо файл уже існує — лише оновлює дату й час його зміни.</p>
+                    <ul class="opts">
+                        <li>кілька файлів за раз: <code>touch a.txt b.txt</code></li>
+                        <li><code>-c</code> — не створювати файл, якщо його немає</li>
+                    </ul>
+                </div>
+<pre class="snip"><span class="ps" data-p="~"></span>touch index.html style.css
+<span class="ps" data-p="~"></span>ls -l index.html style.css
+<span class="o">-rw-r--r-- 1 kyrylik kyrylik 0 Sep 24 10:20 index.html
+-rw-r--r-- 1 kyrylik kyrylik 0 Sep 24 10:20 style.css</span>
+<span class="ps" data-p="~"></span>touch notes.txt  <span class="cm"># оновить лише дату</span></pre>
+            </article>
+
+            <article class="cmd-row">
+                <div>
+                    <h3><span class="cmd-num">6</span><code>mkdir</code><small>make directory</small></h3>
+                    <p>Створює новий каталог (папку). Можна створити кілька каталогів однією командою.</p>
+                    <ul class="opts">
+                        <li><code>-p</code> — створити всі проміжні каталоги; без помилки, якщо каталог уже є</li>
+                        <li><code>-v</code> — повідомляти про кожен створений каталог</li>
+                    </ul>
+                </div>
+<pre class="snip"><span class="ps" data-p="~"></span>mkdir project
+<span class="ps" data-p="~"></span>mkdir -p web/css/img  <span class="cm"># усі рівні</span>
+<span class="ps" data-p="~"></span>mkdir -v photos music
+<span class="o">mkdir: created directory 'photos'
+mkdir: created directory 'music'</span>
+<span class="ps" data-p="~"></span>mkdir project
+<span class="e">mkdir: cannot create directory ‘project’: File exists</span></pre>
+            </article>
+
+            <article class="cmd-row">
+                <div>
+                    <h3><span class="cmd-num">7</span><code>cp</code><small>copy</small></h3>
+                    <p>Копіює файли й каталоги. Спочатку вказують, <em>що</em> копіювати, останнім аргументом — <em>куди</em>.</p>
+                    <ul class="opts">
+                        <li><code>-r</code> — копіювати каталог разом із вмістом</li>
+                        <li><code>-i</code> — запитувати перед перезаписом файлу</li>
+                        <li><code>-v</code> — показувати, що саме копіюється</li>
+                    </ul>
+                </div>
+<pre class="snip"><span class="ps" data-p="~"></span>cp notes.txt backup.txt
+<span class="ps" data-p="~"></span>cp notes.txt Documents/
+<span class="ps" data-p="~"></span>cp -r Documents Documents_copy
+<span class="ps" data-p="~"></span>cp -v login.sh /tmp/
+<span class="o">'login.sh' -&gt; '/tmp/login.sh'</span>
+<span class="ps" data-p="~"></span>cp Downloads /tmp/
+<span class="e">cp: -r not specified; omitting directory 'Downloads'</span></pre>
+            </article>
+
+            <article class="cmd-row">
+                <div>
+                    <h3><span class="cmd-num">8</span><code>mv</code><small>move</small></h3>
+                    <p>Переміщує файли й каталоги в інше місце. Якщо місце призначення — нове ім'я в тому ж каталозі, файл просто перейменовується.</p>
+                    <ul class="opts">
+                        <li><code>-i</code> — запитувати перед перезаписом</li>
+                        <li><code>-n</code> — ніколи не перезаписувати наявні файли</li>
+                        <li><code>-v</code> — показувати виконані дії</li>
+                    </ul>
+                </div>
+<pre class="snip"><span class="ps" data-p="~"></span>mv backup.txt old.txt  <span class="cm"># перейменувати</span>
+<span class="ps" data-p="~"></span>mv old.txt Documents/  <span class="cm"># перемістити</span>
+<span class="ps" data-p="~"></span>mv -v Documents_copy archive
+<span class="o">renamed 'Documents_copy' -&gt; 'archive'</span>
+<span class="ps" data-p="~"></span>ls Documents
+<span class="o">notes.txt  old.txt  plan.txt</span></pre>
+            </article>
+
+            <article class="cmd-row">
+                <div>
+                    <h3><span class="cmd-num">9</span><code>rm</code><small>remove</small></h3>
+                    <p>Видаляє файли, а з опцією <code>-r</code> — каталоги разом із вмістом.</p>
+                    <ul class="opts">
+                        <li><code>-r</code> — видалити каталог з усім вмістом</li>
+                        <li><code>-i</code> — запитувати підтвердження</li>
+                        <li><code>-f</code> — без запитань і повідомлень про помилки</li>
+                        <li><code>-v</code> — показувати, що видалено</li>
+                    </ul>
+                    <p class="warn">У терміналі немає «Кошика»: видалені через <code>rm</code> файли не відновити. Будьте особливо уважні з <code>rm -r</code> та <code>rm -rf</code>.</p>
+                </div>
+<pre class="snip"><span class="ps" data-p="~"></span>rm index.html
+<span class="ps" data-p="~"></span>rm -i style.css
+<span class="o">rm: remove regular empty file 'style.css'? y</span>
+<span class="ps" data-p="~"></span>rm archive
+<span class="e">rm: cannot remove 'archive': Is a directory</span>
+<span class="ps" data-p="~"></span>rm -r archive  <span class="cm"># каталог з усім вмістом</span></pre>
+            </article>
+
+            <article class="cmd-row">
+                <div>
+                    <h3><span class="cmd-num">10</span><code>history</code><small>«історія»</small></h3>
+                    <p>Показує раніше виконані команди з їхніми номерами. Історія зберігається у файлі <code>~/.bash_history</code>, тож її видно й після перезапуску терміналу.</p>
+                    <ul class="opts">
+                        <li><code>history 5</code> — останні 5 команд</li>
+                        <li><code>!101</code> — повторити команду №101, <code>!!</code> — останню</li>
+                        <li><code>history -c</code> — очистити історію</li>
+                        <li><kbd>Ctrl</kbd>+<kbd>R</kbd> — пошук в історії</li>
+                    </ul>
+                </div>
+<pre class="snip"><span class="ps" data-p="~"></span>history 5
+<span class="o">  101  cd Documents
+  102  ls -la
+  103  mkdir project
+  104  cp notes.txt Documents/
+  105  history 5</span>
+<span class="ps" data-p="~"></span>!101
+<span class="o">cd Documents</span>
+<span class="ps" data-p="~/Documents"></span>history -c</pre>
+            </article>
+        </div>
+
+        <div class="keys">
+            <h3>Корисні клавіші терміналу</h3>
+            <ul>
+                <li><kbd>Tab</kbd> — автодоповнення команд і шляхів</li>
+                <li><kbd>↑</kbd> <kbd>↓</kbd> — гортати історію команд</li>
+                <li><kbd>Ctrl</kbd>+<kbd>C</kbd> — перервати виконання команди</li>
+                <li><kbd>Ctrl</kbd>+<kbd>L</kbd> — очистити екран (як <code>clear</code>)</li>
+                <li><kbd>Ctrl</kbd>+<kbd>R</kbd> — пошук в історії команд</li>
+                <li><kbd>Ctrl</kbd>+<kbd>D</kbd> — кінець введення / вихід з оболонки</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- ===== 04. BASH-СКРИПТ АВТОРИЗАЦІЇ ===== -->
+    <section id="script">
+        <h2><span class="h-num">04</span>Bash-скрипт авторизації</h2>
+        <p>Скрипт <code>login.sh</code> імітує вхід у систему в текстовому режимі, як у консолі Linux (tty): показує екран входу, запитує логін і пароль (під час введення пароль не відображається), перевіряє їх, дає <strong>3 спроби</strong> і записує кожну подію в журнал <code>auth.log</code>.</p>
+        <ul class="tags">
+            <li>Bash 4+</li>
+            <li>паролі зберігаються як хеш SHA-256</li>
+            <li>3 спроби, потім блокування</li>
+            <li>журнал входів</li>
+            <li>перевірено ShellCheck</li>
+        </ul>
+
+        <div class="window">
+            <div class="window-bar">
+                <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+                <span class="window-title">login.sh</span>
+                <div class="bar-actions">
+                    <button type="button" class="btn-sm" id="copy-script">Копіювати</button>
+                    <button type="button" class="btn-sm" id="download-script">Завантажити</button>
+                </div>
+            </div>
+<pre class="code"><code id="script-code">#!/usr/bin/env bash
+# ==================================================================
+#  login.sh — імітація авторизації в системі у текстовому режимі
+#  Автор:   Кирилюк Микола, 2026
+#  Запуск:  chmod +x login.sh &amp;&amp; ./login.sh
+# ==================================================================
+
+# ---------- Налаштування ----------
+readonly MAX_ATTEMPTS=3        # максимальна кількість спроб входу
+readonly DELAY=2               # пауза (с) після невдалої спроби
+readonly LOG_FILE="auth.log"   # журнал подій входу
+
+# ---------- Кольори тексту (ANSI escape-коди) ----------
+readonly RED=$'\e[31m' GREEN=$'\e[32m' YELLOW=$'\e[33m'
+readonly CYAN=$'\e[36m' BOLD=$'\e[1m' RESET=$'\e[0m'
+
+# ---------- Облікові записи: логін -&gt; SHA-256 хеш пароля ----------
+# Як і в /etc/shadow, паролі не зберігаються у відкритому вигляді.
+# Отримати хеш:  printf '%s' 'пароль' | sha256sum
+declare -A USERS=(
+    [student]="791e4e58b732fdf54ab99f052d4e99d058fbe4bdd74e3463b8535e04d3d2da9d"
+    [admin]="6051fc84a7a0d74c225fb18a496b09952da5642e60723ecae543298edd7d82d6"
+)
+
+# ---------- Функції ----------
+hash_password() {              # SHA-256 хеш рядка
+    printf '%s' "$1" | sha256sum | cut -d ' ' -f 1
+}
+
+log_event() {                  # запис у журнал: дата час СТАТУС логін
+    echo "$(date '+%F %T') $1 $2" &gt;&gt; "$LOG_FILE"
+}
+
+show_banner() {                # «екран входу» текстового режиму
+    clear
+    echo "${CYAN}──────────────────────────────────────────────${RESET}"
+    echo "  ${BOLD}$(uname -o) $(uname -r)${RESET}  ·  $HOSTNAME"
+    echo "  Система авторизації користувачів"
+    echo "${CYAN}──────────────────────────────────────────────${RESET}"
+    echo
+}
+
+# Ctrl+C: повертаємо відображення вводу і коректно завершуємо роботу
+trap 'stty echo 2&gt;/dev/null; echo; echo "${YELLOW}Вхід скасовано.${RESET}"; exit 130' INT
+
+# ---------- Основна програма ----------
+show_banner
+
+for (( attempt = 1; attempt &lt;= MAX_ATTEMPTS; attempt++ )); do
+    read -r  -p "$HOSTNAME login: " login
+    read -rs -p "Password: " password
+    echo                               # новий рядок після прихованого вводу
+
+    # Логін існує і хеш введеного пароля збігається зі збереженим?
+    if [[ -n $login &amp;&amp; -n ${USERS[$login]} &amp;&amp;
+          $(hash_password "$password") == "${USERS[$login]}" ]]; then
+        last=$(grep " SUCCESS $login\$" "$LOG_FILE" 2&gt;/dev/null | tail -n 1 | cut -d ' ' -f 1,2)
+        log_event SUCCESS "$login"
+
+        echo
+        echo "${GREEN}${BOLD}✔ Доступ дозволено.${RESET} Ласкаво просимо, ${BOLD}$login${RESET}!"
+        echo "  Останній вхід:    ${last:-перший вхід у систему}"
+        echo "  Поточний час:     $(date '+%F %T')"
+        echo "  Домашній каталог: /home/$login"
+        [[ $login == admin ]] &amp;&amp; echo "${YELLOW}  Увага: ви працюєте з правами адміністратора.${RESET}"
+        exit 0
+    fi
+
+    log_event FAIL "${login:-(порожній)}"
+    echo "${RED}✘ Невірний логін або пароль.${RESET} Залишилось спроб: $(( MAX_ATTEMPTS - attempt ))"
+    echo
+    sleep "$DELAY"
+done
+
+log_event LOCKED "${login:-(порожній)}"
+echo "${RED}${BOLD}✘ Доступ заблоковано: перевищено ліміт спроб ($MAX_ATTEMPTS).${RESET}"
+exit 1
+</code></pre>
+        </div>
+
+        <div class="script-cta">
+            <p>Тестові облікові записи: <code>student</code> / <code>linux123</code> і <code>admin</code> / <code>admin2026</code></p>
+            <button type="button" class="btn" id="run-script">▶ Запустити в демо-терміналі</button>
+        </div>
+
+        <h3>Як запустити</h3>
+        <ol class="steps">
+            <li>Створіть файл і вставте в нього код: <code>nano login.sh</code> (зберегти — <kbd>Ctrl</kbd>+<kbd>O</kbd>, <kbd>Enter</kbd>; вийти — <kbd>Ctrl</kbd>+<kbd>X</kbd>).</li>
+            <li>Дозвольте виконання файлу: <code>chmod +x login.sh</code></li>
+            <li>Запустіть скрипт: <code>./login.sh</code></li>
+            <li>Перегляньте журнал входів: <code>cat auth.log</code></li>
+        </ol>
+        <p class="note">Скрипт працює в будь-якому дистрибутиві Linux, а на Windows — у WSL чи Git Bash. Якщо з'являється помилка <code>$'\r': command not found</code>, файл збережено з Windows-закінченнями рядків — виправте командою <code>sed -i 's/\r$//' login.sh</code>.</p>
+
+        <h3>Приклад роботи</h3>
+        <div class="demo-grid">
+            <div class="window">
+                <div class="window-bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="window-title">Успішний вхід з другої спроби</span></div>
+<pre class="snip"><span class="t-cyan">──────────────────────────────────────────────</span>
+  <b>GNU/Linux 6.8.0-45-generic</b>  ·  ubuntu
+  Система авторизації користувачів
+<span class="t-cyan">──────────────────────────────────────────────</span>
+
+ubuntu login: student
+Password:
+<span class="t-red">✘ Невірний логін або пароль.</span> Залишилось спроб: 2
+
+ubuntu login: student
+Password:
+
+<span class="t-green"><b>✔ Доступ дозволено.</b></span> Ласкаво просимо, <b>student</b>!
+  Останній вхід:    2026-09-23 18:42:07
+  Поточний час:     2026-09-24 10:31:15
+  Домашній каталог: /home/student
+<span class="ps" data-p="~"></span>cat auth.log
+<span class="o">2026-09-23 18:42:07 SUCCESS student
+2026-09-24 10:31:09 FAIL student
+2026-09-24 10:31:15 SUCCESS student</span></pre>
+            </div>
+            <div class="window">
+                <div class="window-bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="window-title">Блокування після 3 невдалих спроб</span></div>
+<pre class="snip"><span class="t-cyan">──────────────────────────────────────────────</span>
+  <b>GNU/Linux 6.8.0-45-generic</b>  ·  ubuntu
+  Система авторизації користувачів
+<span class="t-cyan">──────────────────────────────────────────────</span>
+
+ubuntu login: admin
+Password:
+<span class="t-red">✘ Невірний логін або пароль.</span> Залишилось спроб: 2
+
+ubuntu login: admin
+Password:
+<span class="t-red">✘ Невірний логін або пароль.</span> Залишилось спроб: 1
+
+ubuntu login: root
+Password:
+<span class="t-red">✘ Невірний логін або пароль.</span> Залишилось спроб: 0
+
+<span class="t-red"><b>✘ Доступ заблоковано: перевищено ліміт спроб (3).</b></span>
+<span class="ps" data-p="~"></span>echo $?
+<span class="o">1</span></pre>
+            </div>
+        </div>
+
+        <h3>Як працює скрипт</h3>
+        <table class="command-table">
+            <thead>
+                <tr><th>Конструкція</th><th>Призначення</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>#!/usr/bin/env bash</code></td><td>Шебанг: вказує системі, що скрипт виконує інтерпретатор Bash.</td></tr>
+                <tr><td><code>readonly</code></td><td>Константи з налаштуваннями: кількість спроб, пауза, ім'я журналу.</td></tr>
+                <tr><td><code>$'\e[31m'</code></td><td>ANSI escape-коди для кольорового тексту в терміналі.</td></tr>
+                <tr><td><code>declare -A USERS</code></td><td>Асоціативний масив «логін → хеш пароля» — імітація файлу <code>/etc/shadow</code>.</td></tr>
+                <tr><td><code>sha256sum</code></td><td>Обчислює хеш введеного пароля: паролі порівнюються за хешем, а не у відкритому вигляді.</td></tr>
+                <tr><td><code>hash_password() { … }</code></td><td>Функції для повторюваних дій: хешування, запис у журнал, екран входу.</td></tr>
+                <tr><td><code>trap '…' INT</code></td><td>Перехоплює <kbd>Ctrl</kbd>+<kbd>C</kbd>: повертає відображення вводу й коректно завершує скрипт.</td></tr>
+                <tr><td><code>for (( … ))</code></td><td>Цикл з лічильником, що обмежує кількість спроб входу.</td></tr>
+                <tr><td><code>read -p</code> / <code>read -s</code></td><td>Зчитує логін із підказкою та пароль без відображення символів.</td></tr>
+                <tr><td><code>[[ … ]]</code></td><td>Перевіряє, що логін існує і хеш пароля збігається зі збереженим.</td></tr>
+                <tr><td><code>&gt;&gt; "$LOG_FILE"</code></td><td>Дописує подію (дата, час, статус, логін) у кінець журналу.</td></tr>
+                <tr><td><code>sleep "$DELAY"</code></td><td>Пауза після помилки ускладнює підбір пароля (brute force).</td></tr>
+                <tr><td><code>exit 0</code> / <code>exit 1</code></td><td>Код завершення: 0 — успішний вхід, 1 — доступ заблоковано.</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- ===== 05. ДЕМО-ТЕРМІНАЛ ===== -->
+    <section id="terminal">
+        <h2><span class="h-num">05</span>Демо-термінал: спробуйте самі</h2>
+        <p>Симуляція терміналу Bash прямо в браузері: віртуальна файлова система, усі 10 команд з цієї сторінки та скрипт <code>login.sh</code>. Нічого не встановлюється й нічого не зламається — будь-коли натисніть «Скинути». Введіть <code>help</code>, щоб побачити всі команди.</p>
+
+        <div class="window term" id="term">
+            <div class="window-bar">
+                <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+                <span class="window-title" id="term-title">kyrylik@ubuntu: ~</span>
+                <div class="bar-actions">
+                    <button type="button" class="btn-sm" id="term-reset">Скинути</button>
+                </div>
+            </div>
+            <div class="term-body" id="term-body">
+                <div class="term-out" id="term-out" role="log" aria-live="polite"></div>
+                <form class="term-line" id="term-line" data-mode="idle" autocomplete="off">
+                    <label class="term-prompt" id="term-prompt" for="term-input"></label>
+                    <span class="term-cursor" id="term-cursor" hidden></span>
+                    <input class="term-input" id="term-input" type="text" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="send" aria-label="Команда для демо-терміналу">
+                </form>
+            </div>
+        </div>
+        <noscript><p class="note">Для роботи демо-терміналу потрібен увімкнений JavaScript.</p></noscript>
+
+        <div class="chips" id="term-chips">
+            <span class="chips-label">Швидкі команди:</span>
+            <button type="button" data-cmd="pwd">pwd</button>
+            <button type="button" data-cmd="ls -la">ls -la</button>
+            <button type="button" data-cmd="mkdir project">mkdir project</button>
+            <button type="button" data-cmd="cd project">cd project</button>
+            <button type="button" data-cmd="touch index.html">touch index.html</button>
+            <button type="button" data-cmd='echo "Привіт, Linux!" &gt; hello.txt'>echo "Привіт, Linux!" &gt; hello.txt</button>
+            <button type="button" data-cmd="cat hello.txt">cat hello.txt</button>
+            <button type="button" data-cmd="cp hello.txt copy.txt">cp hello.txt copy.txt</button>
+            <button type="button" data-cmd="mv copy.txt new.txt">mv copy.txt new.txt</button>
+            <button type="button" data-cmd="rm new.txt">rm new.txt</button>
+            <button type="button" data-cmd="cd ~">cd ~</button>
+            <button type="button" data-cmd="history">history</button>
+            <button type="button" class="run" data-cmd="./login.sh">./login.sh</button>
+            <button type="button" data-cmd="help">help</button>
+            <button type="button" data-cmd="clear">clear</button>
+        </div>
+    </section>
+
+    <!-- ===== 06. ДЖЕРЕЛА ===== -->
+    <section id="sources">
+        <h2><span class="h-num">06</span>Джерела інформації</h2>
+        <div class="src-groups">
+            <div>
+                <h3>Офіційна документація</h3>
+                <ul class="src-list">
+                    <li><a href="https://www.kernel.org/" target="_blank" rel="noopener">The Linux Kernel Archives</a><span>Офіційний сайт ядра Linux</span></li>
+                    <li><a href="https://www.gnu.org/gnu/linux-and-gnu.html" target="_blank" rel="noopener">Linux and the GNU System</a><span>Р. Столлман про назву GNU/Linux</span></li>
+                    <li><a href="https://www.gnu.org/software/bash/manual/" target="_blank" rel="noopener">GNU Bash Reference Manual</a><span>Повний посібник з оболонки Bash</span></li>
+                    <li><a href="https://www.gnu.org/software/coreutils/manual/" target="_blank" rel="noopener">GNU Coreutils Manual</a><span>Опис ls, cp, mv, rm, mkdir, touch, pwd, echo</span></li>
+                    <li><a href="https://man7.org/linux/man-pages/" target="_blank" rel="noopener">Linux man-pages</a><span>Довідкові сторінки man онлайн</span></li>
+                </ul>
+            </div>
+            <div>
+                <h3>Навчальні матеріали</h3>
+                <ul class="src-list">
+                    <li><a href="https://uk.wikipedia.org/wiki/Linux" target="_blank" rel="noopener">Linux — Вікіпедія</a><span>Історія, будова, дистрибутиви</span></li>
+                    <li><a href="https://uk.wikipedia.org/wiki/Bash" target="_blank" rel="noopener">Bash — Вікіпедія</a><span>Командна оболонка Bash</span></li>
+                    <li><a href="https://ubuntu.com/tutorials/command-line-for-beginners" target="_blank" rel="noopener">The Linux command line for beginners</a><span>Покроковий курс від Ubuntu</span></li>
+                    <li><a href="https://linuxjourney.com/" target="_blank" rel="noopener">Linux Journey</a><span>Безкоштовний курс з основ Linux</span></li>
+                    <li><a href="https://tldp.org/LDP/abs/html/" target="_blank" rel="noopener">Advanced Bash-Scripting Guide</a><span>Посібник зі скриптів Bash</span></li>
+                </ul>
+            </div>
+            <div>
+                <h3>Інструменти та статистика</h3>
+                <ul class="src-list">
+                    <li><a href="https://distrowatch.com/" target="_blank" rel="noopener">DistroWatch</a><span>Каталог і рейтинг дистрибутивів</span></li>
+                    <li><a href="https://www.shellcheck.net/" target="_blank" rel="noopener">ShellCheck</a><span>Перевірка Bash-скриптів на помилки</span></li>
+                    <li><a href="https://explainshell.com/" target="_blank" rel="noopener">explainshell</a><span>Пояснює будь-яку команду по частинах</span></li>
+                    <li><a href="https://www.top500.org/statistics/list/" target="_blank" rel="noopener">TOP500</a><span>Статистика суперкомп'ютерів світу</span></li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<footer>&copy; 2026 Кирилюк Микола</footer>
+
+<script>
+(() => {
+    'use strict';
+
+    /* =================================================================
+       1. СКРИПТ login.sh: підсвітка синтаксису, копіювання, завантаження
+       ================================================================= */
+    const codeEl = document.getElementById('script-code');
+    const SCRIPT_TEXT = codeEl ? codeEl.textContent : '';
+
+    const HL_KEYWORDS = new Set(['if', 'then', 'else', 'elif', 'fi', 'for', 'while', 'until', 'do', 'done',
+        'case', 'esac', 'in', 'function', 'return', 'exit', 'break', 'continue']);
+    const HL_COMMANDS = new Set(['echo', 'printf', 'read', 'readonly', 'declare', 'local', 'trap', 'sleep',
+        'clear', 'cut', 'date', 'uname', 'grep', 'tail', 'sha256sum', 'stty', 'export', 'cd', 'cat']);
+
+    const escHtml = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const hlSpan = (cls, s) => '<span class="' + cls + '">' + escHtml(s) + '</span>';
+
+    // $var, ${...}, $(, $((, $1, $? ...
+    function matchVar(s, i) {
+        if (s[i + 1] === '{') {
+            const j = s.indexOf('}', i + 2);
+            return j > 0 ? s.slice(i, j + 1) : null;
+        }
+        if (s[i + 1] === '(') return s[i + 2] === '(' ? '$((' : '$(';
+        const m = /^\$(?:[A-Za-z_]\w*|[0-9?#@*$!])/.exec(s.slice(i));
+        return m ? m[0] : null;
+    }
+
+    function highlightLine(line) {
+        let html = '';
+        let i = 0;
+        const fn = /^(\s*)([A-Za-z_]\w*)(\(\))/.exec(line);
+        if (fn) {
+            html += escHtml(fn[1]) + hlSpan('hl-fn', fn[2]) + escHtml(fn[3]);
+            i = fn[0].length;
+        }
+        while (i < line.length) {
+            const c = line[i];
+            const prev = i > 0 ? line[i - 1] : ' ';
+            if (c === '#' && /\s/.test(prev)) {                        // коментар
+                html += hlSpan('hl-cm', line.slice(i));
+                break;
+            }
+            if (c === "'" || (c === '$' && line[i + 1] === "'")) {     // '...' та $'...'
+                const open = c === '$' ? i + 1 : i;
+                let j = line.indexOf("'", open + 1);
+                if (j < 0) j = line.length - 1;
+                html += hlSpan('hl-str', line.slice(i, j + 1));
+                i = j + 1;
+                continue;
+            }
+            if (c === '"') {                                            // "..." зі змінними всередині
+                let j = i + 1;
+                let piece = '"';
+                while (j < line.length && line[j] !== '"') {
+                    if (line[j] === '\\' && j + 1 < line.length) {
+                        piece += line.slice(j, j + 2);
+                        j += 2;
+                        continue;
+                    }
+                    const v = line[j] === '$' ? matchVar(line, j) : null;
+                    if (v) {
+                        html += hlSpan('hl-str', piece) + hlSpan('hl-var', v);
+                        piece = '';
+                        j += v.length;
+                        continue;
+                    }
+                    piece += line[j++];
+                }
+                if (j < line.length) piece += '"';
+                html += hlSpan('hl-str', piece);
+                i = j + 1;
+                continue;
+            }
+            if (c === '$') {
+                const v = matchVar(line, i);
+                if (v) {
+                    html += hlSpan('hl-var', v);
+                    i += v.length;
+                    continue;
+                }
+            }
+            if (/[A-Za-z_]/.test(c) && !/[\w-]/.test(prev)) {         // слова: ключові слова та команди
+                const w = /^[A-Za-z_][\w-]*/.exec(line.slice(i))[0];
+                if (HL_KEYWORDS.has(w)) html += hlSpan('hl-kw', w);
+                else if (HL_COMMANDS.has(w)) html += hlSpan('hl-cmd', w);
+                else html += escHtml(w);
+                i += w.length;
+                continue;
+            }
+            if (c === '-' && /\s/.test(prev) && /[A-Za-z]/.test(line[i + 1] || '')) {   // опції: -r, -rs
+                const f = /^-[A-Za-z]+/.exec(line.slice(i))[0];
+                html += hlSpan('hl-flag', f);
+                i += f.length;
+                continue;
+            }
+            if (/\d/.test(c) && !/[\w.]/.test(prev)) {                 // числа
+                const n = /^\d+/.exec(line.slice(i))[0];
+                html += hlSpan('hl-num', n);
+                i += n.length;
+                continue;
+            }
+            html += escHtml(c);
+            i++;
+        }
+        return html;
+    }
+
+    if (codeEl) {
+        codeEl.innerHTML = SCRIPT_TEXT.replace(/\n$/, '').split('\n')
+            .map(line => '<span class="ln">' + highlightLine(line) + '</span>').join('');
+        codeEl.classList.add('hl');
+    }
+
+    async function copyText(text) {
+        try {
+            await navigator.clipboard.writeText(text);
+            return true;
+        } catch (e) {
+            // запасний варіант для сайтів без HTTPS
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.setAttribute('readonly', '');
+            ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;';
+            document.body.appendChild(ta);
+            ta.select();
+            let ok = false;
+            try { ok = document.execCommand('copy'); } catch (e2) { ok = false; }
+            ta.remove();
+            return ok;
+        }
+    }
+
+    function flash(btn, text) {
+        if (!btn.dataset.label) btn.dataset.label = btn.textContent;
+        btn.textContent = text;
+        btn.classList.add('done');
+        clearTimeout(btn.flashTimer);
+        btn.flashTimer = setTimeout(() => {
+            btn.textContent = btn.dataset.label;
+            btn.classList.remove('done');
+        }, 2000);
+    }
+
+    const copyBtn = document.getElementById('copy-script');
+    if (copyBtn) {
+        copyBtn.addEventListener('click', async () => {
+            flash(copyBtn, (await copyText(SCRIPT_TEXT)) ? 'Скопійовано ✓' : 'Не вдалося');
+        });
+    }
+
+    const downloadBtn = document.getElementById('download-script');
+    if (downloadBtn) {
+        downloadBtn.addEventListener('click', () => {
+            const url = URL.createObjectURL(new Blob([SCRIPT_TEXT], { type: 'text/plain;charset=utf-8' }));
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'login.sh';
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 1500);
+            flash(downloadBtn, 'Завантажено ✓');
+        });
+    }
+
+    /* =================================================================
+       2. ДЕМО-ТЕРМІНАЛ: віртуальна файлова система + міні-оболонка Bash
+       ================================================================= */
+    const term = document.getElementById('term');
+    if (!term) return;
+    const bodyEl = document.getElementById('term-body');
+    const outEl = document.getElementById('term-out');
+    const formEl = document.getElementById('term-line');
+    const promptEl = document.getElementById('term-prompt');
+    const cursorEl = document.getElementById('term-cursor');
+    const inputEl = document.getElementById('term-input');
+    const titleEl = document.getElementById('term-title');
+    const chipsEl = document.getElementById('term-chips');
+
+    const USER = 'kyrylik';
+    const HOST = 'ubuntu';
+    const HOME = '/home/' + USER;
+    const KERNEL = '6.8.0-45-generic';
+    const LOGIN_USERS = { student: 'linux123', admin: 'admin2026' };   // ті самі, що в login.sh
+    const MAX_ATTEMPTS = 3;
+    const DELAY_MS = 2000;
+    const MAX_LINES = 800;
+    const EXIT_NOTE = 'У демо-терміналі вихід вимкнено. Щоб почати спочатку, натисніть «Скинути».\n';
+    const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const ERR = {
+        ENOENT: 'No such file or directory', ENOTDIR: 'Not a directory', EACCES: 'Permission denied',
+        EISDIR: 'Is a directory', EEXIST: 'File exists', ENOTEMPTY: 'Directory not empty'
+    };
+    const hasOwn = (obj, key) => Object.prototype.hasOwnProperty.call(obj, key);
+    const pad2 = n => String(n).padStart(2, '0');
+    const finePointer = window.matchMedia ? window.matchMedia('(pointer: fine)').matches : true;
+    const collator = new Intl.Collator('en', { sensitivity: 'base', ignorePunctuation: true });
+    const byName = (a, b) => collator.compare(a, b) || (a < b ? -1 : a > b ? 1 : 0);
+
+    /* ---------- Файлова система ---------- */
+    function daysAgo(days, h, m) {
+        const d = new Date();
+        d.setDate(d.getDate() - days);
+        d.setHours(h, m, 0, 0);
+        return d;
+    }
+    function mkDir(children, o) {
+        o = o || {};
+        return {
+            type: 'd', children: new Map(Object.entries(children || {})),
+            mode: o.mode === undefined ? 0o755 : o.mode,
+            owner: o.owner || 'root', group: o.group || o.owner || 'root',
+            mtime: o.mtime || new Date()
+        };
+    }
+    function mkFile(content, o) {
+        o = o || {};
+        return {
+            type: 'f', content: content || '',
+            mode: o.mode === undefined ? 0o644 : o.mode,
+            owner: o.owner || 'root', group: o.group || o.owner || 'root',
+            mtime: o.mtime || new Date(), prog: o.prog || null
+        };
+    }
+
+    function buildFs() {
+        const old = daysAgo(23, 9, 0);
+        const mid = daysAgo(4, 18, 30);
+        const fresh = daysAgo(0, 9, 12);
+        const my = extra => Object.assign({ owner: USER }, extra);
+        const bin = {};
+        ['bash', 'cat', 'chmod', 'cp', 'date', 'echo', 'ls', 'mkdir', 'mv', 'pwd', 'rm', 'sleep', 'touch', 'uname', 'whoami']
+            .forEach(name => { bin[name] = mkFile('', { mode: 0o755, prog: 'builtin:' + name, mtime: old }); });
+        return mkDir({
+            bin: mkDir(bin, { mtime: old }),
+            dev: mkDir({ null: mkFile('', { mode: 0o666, prog: 'null', mtime: old }) }, { mtime: old }),
+            etc: mkDir({
+                hostname: mkFile(HOST + '\n', { mtime: old }),
+                'os-release': mkFile('PRETTY_NAME="Ubuntu 24.04 LTS"\nNAME="Ubuntu"\nVERSION_ID="24.04"\n' +
+                    'VERSION="24.04 LTS (Noble Numbat)"\nID=ubuntu\nID_LIKE=debian\n', { mtime: old }),
+                passwd: mkFile('root:x:0:0:root:/root:/bin/bash\n' +
+                    USER + ':x:1000:1000:Kyryliuk Mykola:' + HOME + ':/bin/bash\n', { mtime: old }),
+                shadow: mkFile('root:*:20000:0:99999:7:::\n', { mode: 0o640, group: 'shadow', mtime: old })
+            }, { mtime: old }),
+            home: mkDir({
+                [USER]: mkDir({
+                    '.bashrc': mkFile('# ~/.bashrc: налаштування інтерактивної оболонки Bash\n' +
+                        'HISTCONTROL=ignoreboth\nHISTSIZE=1000\nalias ll=\'ls -la\'\n', my({ mtime: old })),
+                    '.profile': mkFile('# ~/.profile: виконується під час входу в систему\n' +
+                        'if [ -f "$HOME/.bashrc" ]; then\n    . "$HOME/.bashrc"\nfi\n', my({ mtime: old })),
+                    Documents: mkDir({
+                        'plan.txt': mkFile('План вивчення Linux:\n1. Навігація: pwd, ls, cd\n' +
+                            '2. Файли й каталоги: touch, mkdir, cp, mv, rm\n3. Історія команд: history\n' +
+                            '4. Bash-скрипти: ./login.sh\n', my({ mtime: mid }))
+                    }, my({ mtime: mid })),
+                    Downloads: mkDir({}, my({ mtime: mid })),
+                    'login.sh': mkFile(SCRIPT_TEXT, my({ mode: 0o755, prog: 'login', mtime: fresh })),
+                    'notes.txt': mkFile('Linux — це ядро ОС, а GNU — набір системних програм.\n' +
+                        'Разом вони утворюють операційну систему GNU/Linux.\n', my({ mtime: fresh }))
+                }, my({ mode: 0o750, mtime: fresh }))
+            }, { mtime: old }),
+            root: mkDir({}, { mode: 0o700, mtime: old }),
+            tmp: mkDir({}, { mode: 0o1777, mtime: fresh }),
+            usr: mkDir({ bin: mkDir({}, { mtime: old }), share: mkDir({}, { mtime: old }) }, { mtime: old }),
+            var: mkDir({
+                log: mkDir({
+                    syslog: mkFile('', { mode: 0o640, group: 'adm', mtime: fresh })
+                }, { mtime: fresh })
+            }, { mtime: old })
+        }, { mtime: old });
+    }
+
+    let fs, cwd, oldpwd, hist, lastStatus, env;
+    let histPos = 0;
+    let draft = '';
+    let busy = false;
+    let run = null;            // стан команди, що виконується: { aborted, handlers }
+    let pendingRead = null;    // очікування введення (read, cat, login.sh)
+    let curLine = null;        // незавершений рядок виводу
+
+    function resetState() {
+        fs = buildFs();
+        cwd = HOME.split('/').filter(Boolean);
+        oldpwd = null;
+        hist = [];
+        histPos = 0;
+        draft = '';
+        lastStatus = 0;
+        env = Object.assign(Object.create(null), {
+            USER: USER, LOGNAME: USER, HOME: HOME, SHELL: '/bin/bash', HOSTNAME: HOST,
+            LANG: 'uk_UA.UTF-8', PATH: '/usr/local/bin:/usr/bin:/bin', TERM: 'xterm-256color'
+        });
+    }
+
+    const absPath = segs => '/' + segs.join('/');
+    function prettyPath(segs) {
+        const p = absPath(segs);
+        if (p === HOME) return '~';
+        return p.startsWith(HOME + '/') ? '~' + p.slice(HOME.length) : p;
+    }
+    function resolve(p, base) {
+        const segs = p.startsWith('/') ? [] : (base || cwd).slice();
+        p.split('/').forEach(part => {
+            if (!part || part === '.') return;
+            if (part === '..') segs.pop();
+            else segs.push(part);
+        });
+        return segs;
+    }
+    const isOwner = n => n.owner === USER;
+    const canRead = n => (n.mode & (isOwner(n) ? 0o400 : 0o004)) !== 0;
+    const canWrite = n => (n.mode & (isOwner(n) ? 0o200 : 0o002)) !== 0;
+    const canExec = n => (n.mode & (isOwner(n) ? 0o100 : 0o001)) !== 0;
+    const isInside = (inner, outer) => inner.length > outer.length && outer.every((s, k) => inner[k] === s);
+    const samePath = (a, b) => a.length === b.length && a.every((s, k) => b[k] === s);
+    const joinPath = (dir, name) => (dir.endsWith('/') ? dir : dir + '/') + name;
+    const byteLen = s => new TextEncoder().encode(s).length;
+
+    function lookup(segs) {
+        let node = fs;
+        for (const name of segs) {
+            if (node.type !== 'd') return { err: 'ENOTDIR' };
+            if (!canExec(node)) return { err: 'EACCES' };
+            node = node.children.get(name);
+            if (!node) return { err: 'ENOENT' };
+        }
+        return { node };
+    }
+    function parentOf(segs) {
+        if (!segs.length) return { err: 'EEXIST' };
+        const r = lookup(segs.slice(0, -1));
+        if (r.err) return r;
+        if (r.node.type !== 'd') return { err: 'ENOTDIR' };
+        return { dir: r.node, name: segs[segs.length - 1] };
+    }
+    function createNode(segs, node) {
+        const p = parentOf(segs);
+        if (p.err) return p;
+        if (p.dir.children.has(p.name)) return { err: 'EEXIST' };
+        if (!canWrite(p.dir)) return { err: 'EACCES' };
+        p.dir.children.set(p.name, node);
+        p.dir.mtime = new Date();
+        return { node };
+    }
+    // Відкриття файлу для запису (оператори > та >>)
+    function openForWrite(target, append) {
+        if (!target) return { err: 'ENOENT' };
+        const segs = resolve(target);
+        const r = lookup(segs);
+        if (!r.err) {
+            const n = r.node;
+            if (n.prog === 'null') return { sink: true };
+            if (n.type === 'd') return { err: 'EISDIR' };
+            if (!canWrite(n)) return { err: 'EACCES' };
+            if (!append) {
+                n.content = '';
+                n.prog = null;
+            }
+            n.mtime = new Date();
+            return { node: n };
+        }
+        if (r.err !== 'ENOENT') return r;
+        return createNode(segs, mkFile('', { owner: USER }));
+    }
+    function cloneNode(n, label, io) {
+        if (n.type === 'f') {
+            return mkFile(n.content, { owner: USER, mode: n.mode & 0o755, prog: n.prog === 'null' ? null : n.prog });
+        }
+        const copy = mkDir({}, { owner: USER, mode: n.mode & 0o755 });
+        n.children.forEach((child, name) => {
+            if (!canRead(child)) {
+                io.err("cp: cannot open '" + label + '/' + name + "' for reading: Permission denied\n");
+                return;
+            }
+            copy.children.set(name, cloneNode(child, label + '/' + name, io));
+        });
+        return copy;
+    }
+
+    /* ---------- Вивід у термінал ---------- */
+    function scrollDown() { bodyEl.scrollTop = bodyEl.scrollHeight; }
+    function newLine() {
+        curLine = document.createElement('div');
+        curLine.className = 't-line';
+        outEl.appendChild(curLine);
+        while (outEl.childElementCount > MAX_LINES) outEl.firstElementChild.remove();
+    }
+    function write(text, cls) {
+        const parts = String(text).split('\n');
+        parts.forEach((part, k) => {
+            const last = k === parts.length - 1;
+            if (part || !last) {
+                if (!curLine) newLine();
+                if (part) {
+                    if (cls) {
+                        const span = document.createElement('span');
+                        span.className = cls;
+                        span.textContent = part;
+                        curLine.appendChild(span);
+                    } else {
+                        curLine.appendChild(document.createTextNode(part));
+                    }
+                }
+            }
+            if (!last) curLine = null;
+        });
+        scrollDown();
+    }
+    function writeGrid(items) {
+        curLine = null;
+        if (!items.length) return;
+        const grid = document.createElement('div');
+        grid.className = 't-grid';
+        const width = Math.max.apply(null, items.map(it => it.t.length)) + 2;
+        grid.style.gridTemplateColumns = 'repeat(auto-fill, ' + width + 'ch)';
+        items.forEach(it => {
+            const span = document.createElement('span');
+            if (it.c) span.className = it.c;
+            span.textContent = it.t;
+            grid.appendChild(span);
+        });
+        outEl.appendChild(grid);
+        scrollDown();
+    }
+    function clearScreen() {
+        outEl.textContent = '';
+        curLine = null;
+    }
+
+    const termIO = {
+        tty: true,
+        out: (t, c) => write(t, c),
+        grid: items => writeGrid(items),
+        err: t => write(t, 'err')
+    };
+    function captureIO() {
+        const io = { tty: false, text: '', err: termIO.err };
+        io.out = t => { io.text += t; };
+        io.grid = items => { io.text += items.map(it => it.t + '\n').join(''); };
+        return io;
+    }
+
+    /* ---------- Рядок введення та запрошення ---------- */
+    const promptParts = () => [[USER + '@' + HOST, 'pu'], [':' + prettyPath(cwd) + '$ ', 'pp']];
+    function echoPrompt(text) {
+        promptParts().forEach(([t, c]) => write(t, c));
+        write(text + '\n', 'tc');
+    }
+    function renderPrompt(parts) {
+        promptEl.textContent = '';
+        parts.forEach(([t, c]) => {
+            const span = document.createElement('span');
+            if (c) span.className = c;
+            span.textContent = t;
+            promptEl.appendChild(span);
+        });
+    }
+    function setMode(mode, promptText, secret) {
+        formEl.dataset.mode = mode;
+        renderPrompt(mode === 'idle' ? promptParts() : (promptText ? [[promptText, '']] : []));
+        inputEl.readOnly = mode === 'busy';
+        inputEl.classList.toggle('secret', mode === 'busy' || !!secret);
+        cursorEl.hidden = !(mode === 'busy' || secret);
+        if (mode !== 'read') inputEl.value = '';
+        titleEl.textContent = USER + '@' + HOST + ': ' + prettyPath(cwd);
+        scrollDown();
+    }
+    function focusInput() {
+        try { inputEl.focus({ preventScroll: true }); } catch (e) { inputEl.focus(); }
+    }
+
+    /* ---------- Переривання (Ctrl+C), паузи та читання рядка ---------- */
+    class Interrupt extends Error {}
+    function onAbort(fn) {
+        const r = run;
+        if (!r) return () => {};
+        r.handlers.push(fn);
+        return () => {
+            const k = r.handlers.indexOf(fn);
+            if (k >= 0) r.handlers.splice(k, 1);
+        };
+    }
+    function interrupt() {
+        if (!run || run.aborted) return;
+        run.aborted = true;
+        run.handlers.splice(0).forEach(fn => fn());
+    }
+    function checkAbort() {
+        if (run && run.aborted) throw new Interrupt();
+    }
+    function delay(ms) {
+        return new Promise((resolve, reject) => {
+            if (run && run.aborted) { reject(new Interrupt()); return; }
+            const timer = setTimeout(() => { off(); resolve(); }, ms);
+            const off = onAbort(() => { clearTimeout(timer); reject(new Interrupt()); });
+        });
+    }
+    function readLine(promptText, opts) {
+        opts = opts || {};
+        return new Promise((resolve, reject) => {
+            if (run && run.aborted) { reject(new Interrupt()); return; }
+            const off = onAbort(() => { pendingRead = null; reject(new Interrupt()); });
+            pendingRead = { prompt: promptText || '', secret: !!opts.secret, resolve, off };
+            setMode('read', promptText, opts.secret);
+        });
+    }
+    function submitRead(value, eof) {
+        const pr = pendingRead;
+        pendingRead = null;
+        pr.off();
+        write(pr.prompt);
+        // як у справжньому терміналі: після прихованого введення курсор лишається в рядку
+        if (!eof && !pr.secret) write(value + '\n', 'tc');
+        setMode('busy');
+        pr.resolve(eof ? null : value);
+    }
+
+    /* ---------- Розбір командного рядка ---------- */
+    // Розбиває рядок на команди за ; && || (з урахуванням лапок і $(...))
+    function splitCommands(src) {
+        const parts = [];
+        let buf = '';
+        let op = null;
+        let quote = null;
+        let depth = 0;
+        const push = next => {
+            const text = buf.trim();
+            buf = '';
+            if (!text) {
+                if (next === null && (op === null || op === ';')) return null;
+                return next === null ? 'syntax error: unexpected end of file'
+                    : "syntax error near unexpected token `" + next + "'";
+            }
+            parts.push({ text, op });
+            op = next;
+            return null;
+        };
+        for (let i = 0; i < src.length; i++) {
+            const c = src[i];
+            if (quote) {
+                buf += c;
+                if (c === '\\' && quote === '"' && i + 1 < src.length) buf += src[++i];
+                else if (c === quote) quote = null;
+                continue;
+            }
+            if (c === '\\') {
+                buf += c + (src[i + 1] || '');
+                i++;
+                continue;
+            }
+            if (c === "'" || c === '"') {
+                quote = c;
+                buf += c;
+                continue;
+            }
+            if (c === '$' && src[i + 1] === '(') {
+                depth++;
+                buf += '$(';
+                i++;
+                continue;
+            }
+            if (depth > 0) {
+                if (c === '(') depth++;
+                else if (c === ')') depth--;
+                buf += c;
+                continue;
+            }
+            if (c === '#' && (!buf || /\s$/.test(buf))) break;       // коментар
+            let tok = null;
+            if (c === ';') tok = ';';
+            else if (c === '&' && src[i + 1] === '&') tok = '&&';
+            else if (c === '|' && src[i + 1] === '|') tok = '||';
+            else if (c === '|') return { err: 'конвеєри (|) у демо-терміналі не підтримуються' };
+            else if (c === '&') return { err: 'фонові процеси (&) у демо-терміналі не підтримуються' };
+            if (tok) {
+                const e = push(tok);
+                if (e) return { err: e };
+                i += tok.length - 1;
+                continue;
+            }
+            buf += c;
+        }
+        if (quote) return { err: 'unexpected EOF while looking for matching `' + quote + "'" };
+        if (depth > 0) return { err: "unexpected EOF while looking for matching `)'" };
+        const e = push(null);
+        return e ? { err: e } : { parts };
+    }
+
+    function getVar(name) {
+        if (name === 'PWD') return absPath(cwd);
+        if (name === 'OLDPWD') return oldpwd ? absPath(oldpwd) : '';
+        if (name === 'RANDOM') return String(Math.floor(Math.random() * 32768));
+        if (name === 'BASH_VERSION') return '5.2.21(1)-release';
+        return env[name] !== undefined ? env[name] : '';
+    }
+
+    // Цілочисельна арифметика для $(( ... )): + - * / % та дужки
+    function arith(expr) {
+        const toks = expr.match(/\d+|[A-Za-z_]\w*|\S/g) || [];
+        let k = 0;
+        const peek = () => toks[k];
+        const next = () => toks[k++];
+        function primary() {
+            const t = next();
+            if (t === '(') {
+                const v = sum();
+                if (next() !== ')') throw new Error('syntax');
+                return v;
+            }
+            if (t === '-') return -primary();
+            if (t === '+') return primary();
+            if (/^\d+$/.test(t || '')) return parseInt(t, 10);
+            if (/^[A-Za-z_]/.test(t || '')) {
+                const v = parseInt(getVar(t), 10);
+                return isNaN(v) ? 0 : v;
+            }
+            throw new Error('syntax');
+        }
+        function product() {
+            let v = primary();
+            while (peek() === '*' || peek() === '/' || peek() === '%') {
+                const o = next();
+                const r = primary();
+                if (o !== '*' && r === 0) throw new Error('division by 0');
+                v = o === '*' ? v * r : o === '/' ? Math.trunc(v / r) : v % r;
+            }
+            return v;
+        }
+        function sum() {
+            let v = product();
+            while (peek() === '+' || peek() === '-') {
+                const o = next();
+                const r = product();
+                v = o === '+' ? v + r : v - r;
+            }
+            return v;
+        }
+        const v = sum();
+        if (k < toks.length) throw new Error('syntax');
+        return v;
+    }
+
+    async function substitute(inner, depth) {
+        if (depth >= 8) return '';
+        const saved = { cwd: cwd, oldpwd: oldpwd };
+        const io = captureIO();
+        try {
+            await runLine(inner, depth + 1, io);
+        } finally {
+            cwd = saved.cwd;
+            oldpwd = saved.oldpwd;
+        }
+        return io.text.replace(/\n+$/, '');
+    }
+
+    // Підстановка $VAR, ${VAR}, $?, $(команда), $((вираз))
+    async function expandDollar(src, i, depth) {
+        const n = src[i + 1];
+        if (n === '?') return { value: String(lastStatus), end: i + 2 };
+        if (n === '$') return { value: '4242', end: i + 2 };
+        if (n === '{') {
+            const j = src.indexOf('}', i + 2);
+            if (j < 0) return { value: '$', end: i + 1 };
+            return { value: getVar(src.slice(i + 2, j)), end: j + 1 };
+        }
+        if (n === '(' && src[i + 2] === '(') {
+            let d = 0;
+            let j = i + 3;
+            for (; j < src.length; j++) {
+                if (src[j] === '(') d++;
+                else if (src[j] === ')') {
+                    if (d === 0 && src[j + 1] === ')') break;
+                    d--;
+                }
+            }
+            const expr = src.slice(i + 3, j);
+            let value = '';
+            try {
+                value = String(arith(expr));
+            } catch (e) {
+                termIO.err('bash: ' + expr.trim() + ': ' + (e.message === 'division by 0' ? 'division by 0' : 'syntax error in expression') + '\n');
+            }
+            return { value, end: Math.min(j + 2, src.length) };
+        }
+        if (n === '(') {
+            let d = 1;
+            let q = null;
+            let j = i + 2;
+            for (; j < src.length; j++) {
+                const ch = src[j];
+                if (q) {
+                    if (ch === '\\' && q === '"') j++;
+                    else if (ch === q) q = null;
+                    continue;
+                }
+                if (ch === "'" || ch === '"') q = ch;
+                else if (ch === '(') d++;
+                else if (ch === ')' && --d === 0) break;
+            }
+            return { value: await substitute(src.slice(i + 2, j), depth), end: j + 1 };
+        }
+        const m = /^[A-Za-z_][A-Za-z0-9_]*/.exec(src.slice(i + 1));
+        if (m) return { value: getVar(m[0]), end: i + 1 + m[0].length };
+        if (n !== undefined && /[0-9#@*!-]/.test(n)) return { value: n === '#' ? '0' : '', end: i + 2 };
+        return { value: '$', end: i + 1 };
+    }
+
+    // Розбиває одну команду на слова та перенаправлення (>, >>, 2>, 2>>)
+    async function tokenize(src, depth) {
+        const words = [];
+        const redirs = [];
+        let w = null;
+        let pending = null;
+        const start = () => { if (!w) w = { v: '', glob: false, quoted: false }; };
+        const flush = () => {
+            if (!w) return;
+            if (pending) {
+                redirs.push({ op: pending, target: w.v });
+                pending = null;
+            } else if (w.v !== '' || w.quoted) {
+                words.push(w);
+            }
+            w = null;
+        };
+        let i = 0;
+        while (i < src.length) {
+            const c = src[i];
+            if (c === ' ' || c === '\t') { flush(); i++; continue; }
+            if (c === '>' || (c === '2' && !w && src[i + 1] === '>')) {
+                flush();
+                let op = c === '2' ? '2>' : '>';
+                i += op.length;
+                if (src[i] === '>') { op += '>'; i++; }
+                if (pending) return { err: "syntax error near unexpected token `" + op + "'" };
+                pending = op;
+                continue;
+            }
+            if (c === '<') return { err: 'перенаправлення вводу (<) у демо-терміналі не підтримується' };
+            if (c === '\\') {
+                start();
+                w.quoted = true;
+                if (i + 1 < src.length) w.v += src[i + 1];
+                i += 2;
+                continue;
+            }
+            if (c === "'") {
+                start();
+                w.quoted = true;
+                const j = src.indexOf("'", i + 1);
+                w.v += src.slice(i + 1, j);
+                i = j + 1;
+                continue;
+            }
+            if (c === '"') {
+                start();
+                w.quoted = true;
+                i++;
+                while (i < src.length && src[i] !== '"') {
+                    if (src[i] === '\\' && i + 1 < src.length && '"\\$`'.includes(src[i + 1])) {
+                        w.v += src[i + 1];
+                        i += 2;
+                        continue;
+                    }
+                    if (src[i] === '$') {
+                        const r = await expandDollar(src, i, depth);
+                        w.v += r.value;
+                        i = r.end;
+                        continue;
+                    }
+                    w.v += src[i++];
+                }
+                i++;
+                continue;
+            }
+            if (c === '$') {
+                start();
+                const r = await expandDollar(src, i, depth);
+                w.v += r.value;
+                i = r.end;
+                continue;
+            }
+            if (c === '~' && !w && (i + 1 === src.length || '/ \t'.includes(src[i + 1]))) {
+                start();
+                w.v += HOME;
+                i++;
+                continue;
+            }
+            start();
+            if (c === '*' || c === '?') w.glob = true;
+            w.v += c;
+            i++;
+        }
+        flush();
+        if (pending) return { err: "syntax error near unexpected token `newline'" };
+        return { words, redirs };
+    }
+
+    // Шаблони * та ? в останній частині шляху
+    function expandGlob(word) {
+        const slash = word.lastIndexOf('/');
+        const dirPart = word.slice(0, slash + 1);
+        const pat = word.slice(slash + 1);
+        if (!pat || /[*?]/.test(dirPart)) return [];
+        const r = lookup(resolve(dirPart || '.'));
+        if (r.err || r.node.type !== 'd' || !canRead(r.node)) return [];
+        const re = new RegExp('^' + pat.replace(/[.+^${}()|[\]\\]/g, '\\$&')
+            .replace(/\*/g, '.*').replace(/\?/g, '.') + '$');
+        return Array.from(r.node.children.keys())
+            .filter(name => re.test(name) && (pat[0] === '.' || name[0] !== '.'))
+            .sort(byName)
+            .map(name => dirPart + name);
+    }
+
+    function expandHistory(line) {
+        let changed = false;
+        let err = null;
+        const out = line.replace(/!(!|-?\d+|[A-Za-z][\w./-]*)/g, (m, ref, offset) => {
+            if (err) return m;
+            if ((line.slice(0, offset).split("'").length - 1) % 2 === 1) return m;   // усередині '...'
+            let entry;
+            if (ref === '!') entry = hist[hist.length - 1];
+            else if (/^-?\d+$/.test(ref)) {
+                const n = parseInt(ref, 10);
+                entry = n > 0 ? hist[n - 1] : hist[hist.length + n];
+            } else {
+                for (let k = hist.length - 1; k >= 0 && entry === undefined; k--) {
+                    if (hist[k].startsWith(ref)) entry = hist[k];
+                }
+            }
+            if (entry === undefined) {
+                err = 'bash: ' + m + ': event not found';
+                return m;
+            }
+            changed = true;
+            return entry;
+        });
+        return { line: out, changed, err };
+    }
+
+    /* ---------- Виконання ---------- */
+    async function runLine(line, depth, io) {
+        const sp = splitCommands(line);
+        if (sp.err) {
+            io.err('bash: ' + sp.err + '\n');
+            return 2;
+        }
+        let status = 0;
+        for (const part of sp.parts) {
+            if (part.op === '&&' && status !== 0) continue;
+            if (part.op === '||' && status === 0) continue;
+            status = await runSimple(part.text, depth, io);
+            lastStatus = status;
+            checkAbort();
+        }
+        return status;
+    }
+
+    async function runSimple(text, depth, io) {
+        const tk = await tokenize(text, depth);
+        if (tk.err) {
+            io.err('bash: ' + tk.err + '\n');
+            return 2;
+        }
+        const argv = [];
+        tk.words.forEach(w => {
+            const matches = w.glob ? expandGlob(w.v) : [];
+            if (matches.length) argv.push.apply(argv, matches);
+            else argv.push(w.v);
+        });
+        // присвоєння змінних: NAME=value
+        const assigns = [];
+        while (argv.length && /^[A-Za-z_]\w*=/.test(argv[0])) assigns.push(argv.shift());
+        if (!argv.length) {
+            assigns.forEach(a => {
+                const eq = a.indexOf('=');
+                env[a.slice(0, eq)] = a.slice(eq + 1);
+            });
+        }
+        // перенаправлення виводу
+        let outNode = null, errNode = null, outRedir = false, errRedir = false;
+        for (const r of tk.redirs) {
+            const res = openForWrite(r.target, r.op.endsWith('>>'));
+            if (res.err) {
+                io.err('bash: ' + r.target + ': ' + ERR[res.err] + '\n');
+                return 1;
+            }
+            if (r.op[0] === '2') { errRedir = true; errNode = res.node || null; }
+            else { outRedir = true; outNode = res.node || null; }
+        }
+        if (!argv.length) return 0;
+        let outBuf = '';
+        let errBuf = '';
+        const cio = {
+            tty: io.tty && !outRedir,
+            out: outRedir ? (t => { outBuf += t; }) : io.out,
+            grid: outRedir ? (items => { outBuf += items.map(it => it.t + '\n').join(''); }) : io.grid,
+            err: errRedir ? (t => { errBuf += t; }) : io.err
+        };
+        try {
+            return await dispatch(argv, cio, depth);
+        } finally {
+            if (outNode && outBuf) { outNode.content += outBuf; outNode.mtime = new Date(); }
+            if (errNode && errBuf) { errNode.content += errBuf; errNode.mtime = new Date(); }
+        }
+    }
+
+    const EDITORS = ['nano', 'vim', 'vi', 'mcedit', 'emacs'];
+    const UNAVAILABLE = ['apt', 'apt-get', 'snap', 'dnf', 'pacman', 'grep', 'find', 'less', 'more', 'head', 'tail',
+        'wc', 'sort', 'rmdir', 'ln', 'tree', 'ps', 'top', 'htop', 'kill', 'ping', 'ssh', 'curl', 'wget', 'git',
+        'python', 'python3', 'su', 'passwd', 'sha256sum', 'stty', 'cut', 'printf', 'file', 'df', 'du', 'free'];
+
+    async function dispatch(argv, io, depth) {
+        let name = argv[0];
+        let args = argv.slice(1);
+        if (name === 'll') {
+            name = 'ls';
+            args = ['-la'].concat(args);
+        }
+        if (name.includes('/')) return execFile(name, args, io, depth, false);
+        if (hasOwn(COMMANDS, name)) return COMMANDS[name](args, io, depth);
+        if (EDITORS.includes(name)) {
+            io.err(name + ': текстові редактори в демо недоступні. Спробуйте: echo "текст" > файл або cat > файл (завершити — Ctrl+D)\n');
+            return 127;
+        }
+        if (UNAVAILABLE.includes(name)) {
+            io.err(name + ': у демо-терміналі ця команда недоступна\n');
+            return 127;
+        }
+        io.err(name + ': command not found\n');
+        if (depth === 0 && io.tty) write('Підказка: введіть help, щоб побачити доступні команди.\n', 'dim');
+        return 127;
+    }
+
+    // Запуск файлу: ./login.sh, bash script.sh, /bin/ls ...
+    async function execFile(p, args, io, depth, viaShell) {
+        const r = lookup(resolve(p));
+        if (r.err) {
+            io.err('bash: ' + p + ': ' + ERR[r.err] + '\n');
+            return 127;
+        }
+        const n = r.node;
+        if (n.type === 'd') {
+            io.err('bash: ' + p + ': Is a directory\n');
+            return 126;
+        }
+        if (viaShell ? !canRead(n) : !canExec(n)) {
+            io.err('bash: ' + p + ': Permission denied\n');
+            return 126;
+        }
+        if (n.prog === 'login') return runLoginScript(io, p);
+        if (n.prog === 'null') return 0;
+        if (n.prog && n.prog.startsWith('builtin:')) return COMMANDS[n.prog.slice(8)](args, io, depth);
+        if (depth >= 8) {
+            io.err('bash: ' + p + ': забагато вкладених викликів скриптів\n');
+            return 1;
+        }
+        let status = 0;
+        for (const line of n.content.split('\n')) {
+            if (!line.trim() || /^\s*#/.test(line)) continue;
+            status = await runLine(line, depth + 1, io);
+            checkAbort();
+        }
+        return status;
+    }
+
+    /* ---------- Імітація login.sh (та сама логіка, що й у Bash-версії) ---------- */
+    function fmtDate(d, f) {
+        return f.replace(/%([a-zA-Z%])/g, (m, c) => {
+            switch (c) {
+                case 'Y': return String(d.getFullYear());
+                case 'y': return pad2(d.getFullYear() % 100);
+                case 'm': return pad2(d.getMonth() + 1);
+                case 'd': return pad2(d.getDate());
+                case 'e': return String(d.getDate()).padStart(2, ' ');
+                case 'H': return pad2(d.getHours());
+                case 'M': return pad2(d.getMinutes());
+                case 'S': return pad2(d.getSeconds());
+                case 'F': return fmtDate(d, '%Y-%m-%d');
+                case 'T': return fmtDate(d, '%H:%M:%S');
+                case 'D': return fmtDate(d, '%m/%d/%y');
+                case 'a': return DAYS[d.getDay()];
+                case 'b': return MONTHS[d.getMonth()];
+                case 'Z': return tzName(d);
+                case 'z': {
+                    const off = -d.getTimezoneOffset();
+                    const a = Math.abs(off);
+                    return (off < 0 ? '-' : '+') + pad2(Math.floor(a / 60)) + pad2(a % 60);
+                }
+                case 's': return String(Math.floor(d.getTime() / 1000));
+                case 'n': return '\n';
+                case 't': return '\t';
+                case '%': return '%';
+                default: return m;
+            }
+        });
+    }
+    function tzName(d) {
+        try {
+            const part = new Intl.DateTimeFormat('en-US', { timeZoneName: 'short' })
+                .formatToParts(d).find(p => p.type === 'timeZoneName');
+            if (part) return part.value;
+        } catch (e) { /* немає підтримки — нижче запасний варіант */ }
+        return 'UTC';
+    }
+
+    function lastSuccess(segs, user) {
+        const r = lookup(segs);
+        if (r.err || r.node.type !== 'f' || !canRead(r.node)) return '';
+        const lines = r.node.content.split('\n').filter(l => l.endsWith(' SUCCESS ' + user));
+        return lines.length ? lines[lines.length - 1].split(' ').slice(0, 2).join(' ') : '';
+    }
+    function logEvent(segs, status, user, io, scriptName) {
+        const res = openForWrite(absPath(segs), true);
+        if (res.err) {
+            io.err(scriptName + ': line 31: auth.log: ' + ERR[res.err] + '\n');
+            return;
+        }
+        if (res.node) {
+            res.node.content += fmtDate(new Date(), '%F %T') + ' ' + status + ' ' + user + '\n';
+            res.node.mtime = new Date();
+        }
+    }
+
+    async function runLoginScript(io, scriptName) {
+        const logSegs = cwd.concat('auth.log');
+        const rule = '──────────────────────────────────────────────\n';
+        try {
+            if (io.tty) clearScreen();
+            io.out(rule, 'c-cyan');
+            io.out('  ');
+            io.out('GNU/Linux ' + KERNEL, 'b');
+            io.out('  ·  ' + HOST + '\n');
+            io.out('  Система авторизації користувачів\n');
+            io.out(rule, 'c-cyan');
+            io.out('\n');
+            let login = '';
+            for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+                login = (await readLine(HOST + ' login: ')) || '';
+                const password = (await readLine('Password: ', { secret: true })) || '';
+                io.out('\n');
+                if (login && hasOwn(LOGIN_USERS, login) && LOGIN_USERS[login] === password) {
+                    const last = lastSuccess(logSegs, login);
+                    logEvent(logSegs, 'SUCCESS', login, io, scriptName);
+                    io.out('\n');
+                    io.out('✔ Доступ дозволено.', 'c-green b');
+                    io.out(' Ласкаво просимо, ');
+                    io.out(login, 'b');
+                    io.out('!\n');
+                    io.out('  Останній вхід:    ' + (last || 'перший вхід у систему') + '\n');
+                    io.out('  Поточний час:     ' + fmtDate(new Date(), '%F %T') + '\n');
+                    io.out('  Домашній каталог: /home/' + login + '\n');
+                    if (login === 'admin') io.out('  Увага: ви працюєте з правами адміністратора.\n', 'c-yellow');
+                    return 0;
+                }
+                logEvent(logSegs, 'FAIL', login || '(порожній)', io, scriptName);
+                io.out('✘ Невірний логін або пароль.', 'c-red');
+                io.out(' Залишилось спроб: ' + (MAX_ATTEMPTS - attempt) + '\n');
+                io.out('\n');
+                await delay(DELAY_MS);
+            }
+            logEvent(logSegs, 'LOCKED', login || '(порожній)', io, scriptName);
+            io.out('✘ Доступ заблоковано: перевищено ліміт спроб (' + MAX_ATTEMPTS + ').\n', 'c-red b');
+            return 1;
+        } catch (e) {
+            if (!(e instanceof Interrupt)) throw e;
+            io.out('\n');                                  // trap ... INT
+            io.out('Вхід скасовано.\n', 'c-yellow');
+            return 130;
+        }
+    }
+
+    /* ---------- Команди ---------- */
+    const HELP = {
+        pwd: ['pwd [-LP]', 'Показує повний шлях до поточного каталогу.'],
+        echo: ['echo [-neE] [текст…]', 'Виводить текст. -n — без переходу на новий рядок, -e — обробляти \\n і \\t.'],
+        ls: ['ls [-laAhR1] [шлях…]', 'Показує вміст каталогу: -l — детально, -a — з прихованими файлами,\n-h — зручні розміри, -R — рекурсивно.'],
+        cd: ['cd [каталог]', 'Змінює поточний каталог: cd — додому, cd .. — вгору, cd - — назад.'],
+        touch: ['touch [-c] файл…', 'Створює порожній файл або оновлює час його зміни.'],
+        mkdir: ['mkdir [-pv] каталог…', 'Створює каталог; -p — разом з усіма батьківськими.'],
+        cp: ['cp [-rivn] джерело… призначення', 'Копіює файли; -r — каталоги з усім вмістом.'],
+        mv: ['mv [-ivn] джерело… призначення', 'Переміщує або перейменовує файли й каталоги.'],
+        rm: ['rm [-rfiv] шлях…', 'Видаляє файли; -r — каталоги з вмістом, -i — з підтвердженням.'],
+        history: ['history [-c] [N]', 'Історія команд. !N — повторити команду N, !! — останню.'],
+        cat: ['cat [-n] [файл…]', 'Виводить вміст файлів; без аргументів читає введення до Ctrl+D.'],
+        chmod: ['chmod режим файл…', 'Змінює права доступу: chmod +x script.sh, chmod 644 file.txt.'],
+        date: ['date [+ФОРМАТ]', 'Показує дату й час, наприклад: date "+%d.%m.%Y %H:%M".'],
+        uname: ['uname [-asnrmo]', 'Інформація про систему: -a — усе, -r — версія ядра, -o — ОС.'],
+        whoami: ['whoami', 'Ім\'я поточного користувача.'],
+        clear: ['clear', 'Очищає екран терміналу (те саме, що Ctrl+L).'],
+        sleep: ['sleep секунди', 'Пауза на вказану кількість секунд.'],
+        read: ['read [-s] [-p підказка] змінна', 'Зчитує рядок у змінну; -s — без відображення символів.']
+    };
+    function showHelp(cmd, io) {
+        io.out('Використання: ' + HELP[cmd][0] + '\n' + HELP[cmd][1] + '\n');
+        return 0;
+    }
+    function parseOpts(cmd, args, allowed, io) {
+        const flags = new Set();
+        const rest = [];
+        let help = false;
+        let endOpts = false;
+        for (const a of args) {
+            if (!endOpts && a === '--') { endOpts = true; continue; }
+            if (!endOpts && a === '--help') { help = true; continue; }
+            if (!endOpts && a.startsWith('--')) {
+                io.err(cmd + ": unrecognized option '" + a + "'\nTry '" + cmd + " --help' for more information.\n");
+                return null;
+            }
+            if (!endOpts && a.length > 1 && a[0] === '-') {
+                for (const ch of a.slice(1)) {
+                    if (!allowed.includes(ch)) {
+                        io.err(cmd + ": invalid option -- '" + ch + "'\nTry '" + cmd + " --help' for more information.\n");
+                        return null;
+                    }
+                    flags.add(ch);
+                }
+                continue;
+            }
+            rest.push(a);
+        }
+        return { rest, help, has: ch => flags.has(ch) };
+    }
+
+    const nodeSize = n => n.type === 'd' ? 4096 : byteLen(n.content);
+    const nameClass = n => n.type === 'd' ? 'dir' : ((n.mode & 0o111) ? 'exe' : '');
+    function permString(n) {
+        let s = n.type === 'd' ? 'd' : '-';
+        [6, 3, 0].forEach(shift => {
+            const b = (n.mode >> shift) & 7;
+            s += (b & 4 ? 'r' : '-') + (b & 2 ? 'w' : '-') + (b & 1 ? 'x' : '-');
+        });
+        if (n.mode & 0o1000) s = s.slice(0, 9) + ((n.mode & 1) ? 't' : 'T');
+        return s;
+    }
+    function humanSize(bytes) {
+        if (bytes < 1024) return String(bytes);
+        const units = ['K', 'M', 'G', 'T'];
+        let v = bytes / 1024;
+        let u = 0;
+        while (v >= 1024 && u < units.length - 1) { v /= 1024; u++; }
+        return (v < 10 ? (Math.ceil(v * 10) / 10).toFixed(1) : String(Math.ceil(v))) + units[u];
+    }
+    function lsDate(d) {
+        const recent = Math.abs(Date.now() - d.getTime()) < 182 * 24 * 3600 * 1000;
+        return MONTHS[d.getMonth()] + ' ' + String(d.getDate()).padStart(2, ' ') + ' ' +
+            (recent ? pad2(d.getHours()) + ':' + pad2(d.getMinutes()) : ' ' + d.getFullYear());
+    }
+    function printEntries(entries, cfg, io, withTotal) {
+        if (cfg.long) {
+            const rows = entries.map(e => ({
+                perm: permString(e.node),
+                links: String(e.node.type === 'd'
+                    ? 2 + Array.from(e.node.children.values()).filter(c => c.type === 'd').length : 1),
+                owner: e.node.owner,
+                group: e.node.group,
+                size: cfg.human ? humanSize(nodeSize(e.node)) : String(nodeSize(e.node)),
+                date: lsDate(e.node.mtime),
+                name: e.name,
+                cls: nameClass(e.node)
+            }));
+            if (withTotal) {
+                const blocks = entries.reduce((sum, e) =>
+                    sum + (e.node.type === 'd' ? 4 : Math.ceil(nodeSize(e.node) / 4096) * 4), 0);
+                io.out('total ' + (cfg.human ? humanSize(blocks * 1024) : blocks) + '\n');
+            }
+            const width = key => rows.reduce((m, r) => Math.max(m, r[key].length), 0);
+            const wl = width('links'), wo = width('owner'), wg = width('group'), ws = width('size');
+            rows.forEach(r => {
+                io.out(r.perm + ' ' + r.links.padStart(wl) + ' ' + r.owner.padEnd(wo) + ' ' +
+                    r.group.padEnd(wg) + ' ' + r.size.padStart(ws) + ' ' + r.date + ' ');
+                io.out(r.name, r.cls);
+                io.out('\n');
+            });
+            return;
+        }
+        if (!entries.length) return;
+        if (cfg.one || !io.tty) {
+            entries.forEach(e => {
+                io.out(e.name, nameClass(e.node));
+                io.out('\n');
+            });
+            return;
+        }
+        io.grid(entries.map(e => ({ t: e.name, c: nameClass(e.node) })));
+    }
+    function listDir(label, node, segs, cfg, io, header) {
+        if (header) io.out(label + ':\n');
+        if (!canRead(node)) {
+            io.err("ls: cannot open directory '" + label + "': Permission denied\n");
+            return 2;
+        }
+        const entries = [];
+        if (cfg.all) {
+            entries.push({ name: '.', node });
+            entries.push({ name: '..', node: lookup(segs.slice(0, -1)).node || node });
+        }
+        const names = Array.from(node.children.keys())
+            .filter(n => cfg.all || cfg.almost || n[0] !== '.')
+            .sort(byName);
+        names.forEach(n => entries.push({ name: n, node: node.children.get(n) }));
+        printEntries(entries, cfg, io, true);
+        let status = 0;
+        if (cfg.rec) {
+            names.forEach(n => {
+                const child = node.children.get(n);
+                if (child.type !== 'd') return;
+                io.out('\n');
+                const childLabel = label === '/' ? '/' + n : label.replace(/\/$/, '') + '/' + n;
+                status = Math.max(status, listDir(childLabel, child, segs.concat(n), cfg, io, true));
+            });
+        }
+        return status;
+    }
+
+    function parseMode(s) {
+        if (/^[0-7]{3,4}$/.test(s)) {
+            const v = parseInt(s, 8);
+            return () => v;
+        }
+        const fns = [];
+        for (const clause of s.split(',')) {
+            const m = /^([ugoa]*)([-+=])([rwx]*)$/.exec(clause);
+            if (!m) return null;
+            const who = m[1] && !m[1].includes('a') ? m[1] : 'ugo';
+            let bits = 0;
+            for (const ch of m[3]) bits |= ch === 'r' ? 4 : ch === 'w' ? 2 : 1;
+            let mask = 0;
+            let full = 0;
+            for (const w of who) {
+                const sh = w === 'u' ? 6 : w === 'g' ? 3 : 0;
+                mask |= bits << sh;
+                full |= 7 << sh;
+            }
+            if (!m[1] && m[2] === '+') mask &= ~0o022;       // umask 022
+            const op = m[2];
+            fns.push(mode => op === '+' ? mode | mask : op === '-' ? mode & ~mask : (mode & ~full) | mask);
+        }
+        return mode => fns.reduce((acc, fn) => fn(acc), mode);
+    }
+
+    function mergeDir(src, target, label, io) {
+        src.children.forEach((child, name) => {
+            const existing = target.children.get(name);
+            if (!existing) {
+                if (canRead(child)) target.children.set(name, cloneNode(child, label + '/' + name, io));
+            } else if (existing.type === 'd' && child.type === 'd') {
+                mergeDir(child, existing, label + '/' + name, io);
+            } else if (existing.type === 'f' && child.type === 'f') {
+                existing.content = child.content;
+                existing.mtime = new Date();
+            }
+        });
+        target.mtime = new Date();
+    }
+
+    const COMMANDS = {
+        pwd(args, io) {
+            const o = parseOpts('pwd', args, 'LP', io);
+            if (!o) return 2;
+            if (o.help) return showHelp('pwd', io);
+            io.out(absPath(cwd) + '\n');
+            return 0;
+        },
+
+        echo(args, io) {
+            let newline = true;
+            let escapes = false;
+            let k = 0;
+            while (k < args.length && /^-[neE]+$/.test(args[k])) {
+                for (const ch of args[k].slice(1)) {
+                    if (ch === 'n') newline = false;
+                    else escapes = ch === 'e';
+                }
+                k++;
+            }
+            let text = args.slice(k).join(' ');
+            if (escapes) {
+                text = text.replace(/\\(.)/g, (m, ch) => ch === 'n' ? '\n' : ch === 't' ? '\t' : ch === '\\' ? '\\' : m);
+            }
+            io.out(text + (newline ? '\n' : ''));
+            return 0;
+        },
+
+        ls(args, io) {
+            const o = parseOpts('ls', args, 'laAhR1', io);
+            if (!o) return 2;
+            if (o.help) return showHelp('ls', io);
+            const cfg = { long: o.has('l'), all: o.has('a'), almost: o.has('A'), human: o.has('h'), one: o.has('1'), rec: o.has('R') };
+            const targets = o.rest.length ? o.rest : ['.'];
+            let status = 0;
+            const files = [];
+            const dirs = [];
+            targets.forEach(t => {
+                const segs = resolve(t);
+                const r = lookup(segs);
+                if (r.err) {
+                    io.err("ls: cannot access '" + t + "': " + ERR[r.err] + '\n');
+                    status = 2;
+                    return;
+                }
+                (r.node.type === 'd' ? dirs : files).push({ name: t, node: r.node, segs });
+            });
+            files.sort((a, b) => byName(a.name, b.name));
+            dirs.sort((a, b) => byName(a.name, b.name));
+            if (files.length) printEntries(files, cfg, io, false);
+            const header = targets.length > 1 || cfg.rec;
+            dirs.forEach((d, k) => {
+                if (files.length || k > 0) io.out('\n');
+                status = Math.max(status, listDir(d.name, d.node, d.segs, cfg, io, header));
+            });
+            return status;
+        },
+
+        cd(args, io) {
+            args = args.filter(a => a !== '-L' && a !== '-P');
+            if (args.length > 1) {
+                io.err('bash: cd: too many arguments\n');
+                return 1;
+            }
+            let target = args.length ? args[0] : HOME;
+            let show = false;
+            if (target === '-') {
+                if (!oldpwd) {
+                    io.err('bash: cd: OLDPWD not set\n');
+                    return 1;
+                }
+                target = absPath(oldpwd);
+                show = true;
+            } else if (target.length > 1 && target[0] === '-') {
+                io.err('bash: cd: ' + target + ': invalid option\ncd: usage: cd [-L|-P] [dir]\n');
+                return 2;
+            }
+            if (target === '') return 0;
+            const segs = resolve(target);
+            const r = lookup(segs);
+            let err = r.err;
+            if (!err && r.node.type !== 'd') err = 'ENOTDIR';
+            if (!err && !canExec(r.node)) err = 'EACCES';
+            if (err) {
+                io.err('bash: cd: ' + target + ': ' + ERR[err] + '\n');
+                return 1;
+            }
+            oldpwd = cwd;
+            cwd = segs;
+            if (show) io.out(absPath(cwd) + '\n');
+            return 0;
+        },
+
+        touch(args, io) {
+            const o = parseOpts('touch', args, 'c', io);
+            if (!o) return 1;
+            if (o.help) return showHelp('touch', io);
+            if (!o.rest.length) {
+                io.err("touch: missing file operand\nTry 'touch --help' for more information.\n");
+                return 1;
+            }
+            let status = 0;
+            o.rest.forEach(p => {
+                const segs = resolve(p);
+                const r = lookup(segs);
+                let err = null;
+                if (!r.err) {
+                    if (r.node.prog === 'null') return;
+                    if (!canWrite(r.node)) err = 'EACCES';
+                    else r.node.mtime = new Date();
+                } else if (r.err !== 'ENOENT') {
+                    err = r.err;
+                } else if (!o.has('c')) {
+                    err = createNode(segs, mkFile('', { owner: USER })).err || null;
+                }
+                if (err) {
+                    io.err("touch: cannot touch '" + p + "': " + ERR[err] + '\n');
+                    status = 1;
+                }
+            });
+            return status;
+        },
+
+        mkdir(args, io) {
+            const o = parseOpts('mkdir', args, 'pv', io);
+            if (!o) return 1;
+            if (o.help) return showHelp('mkdir', io);
+            if (!o.rest.length) {
+                io.err("mkdir: missing operand\nTry 'mkdir --help' for more information.\n");
+                return 1;
+            }
+            let status = 0;
+            const fail = (p, e) => {
+                io.err('mkdir: cannot create directory ‘' + p + '’: ' + ERR[e] + '\n');
+                status = 1;
+            };
+            const make = p => {
+                const c = createNode(resolve(p), mkDir({}, { owner: USER }));
+                if (c.err) return c.err;
+                if (o.has('v')) io.out("mkdir: created directory '" + p + "'\n");
+                return null;
+            };
+            o.rest.forEach(p => {
+                if (!o.has('p')) {
+                    const e = make(p);
+                    if (e) fail(p, e);
+                    return;
+                }
+                const parts = p.split('/').filter(Boolean);
+                for (let k = 1; k <= parts.length; k++) {
+                    const sub = (p.startsWith('/') ? '/' : '') + parts.slice(0, k).join('/');
+                    const r = lookup(resolve(sub));
+                    if (!r.err) {
+                        if (r.node.type !== 'd') {
+                            fail(p, k === parts.length ? 'EEXIST' : 'ENOTDIR');
+                            return;
+                        }
+                        continue;
+                    }
+                    if (r.err !== 'ENOENT') { fail(p, r.err); return; }
+                    const e = make(sub);
+                    if (e) { fail(p, e); return; }
+                }
+            });
+            return status;
+        },
+
+        async cp(args, io) {
+            const o = parseOpts('cp', args, 'rRivnf', io);
+            if (!o) return 1;
+            if (o.help) return showHelp('cp', io);
+            const ops = o.rest;
+            if (!ops.length) {
+                io.err("cp: missing file operand\nTry 'cp --help' for more information.\n");
+                return 1;
+            }
+            if (ops.length === 1) {
+                io.err("cp: missing destination file operand after '" + ops[0] + "'\nTry 'cp --help' for more information.\n");
+                return 1;
+            }
+            const rec = o.has('r') || o.has('R');
+            const destStr = ops[ops.length - 1];
+            const destSegs = resolve(destStr);
+            const dr = lookup(destSegs);
+            const intoDir = !dr.err && dr.node.type === 'd';
+            if (ops.length > 2 && !intoDir) {
+                io.err("cp: target '" + destStr + "' is not a directory\n");
+                return 1;
+            }
+            let status = 0;
+            const fail = msg => {
+                io.err('cp: ' + msg + '\n');
+                status = 1;
+            };
+            for (const src of ops.slice(0, -1)) {
+                const sSegs = resolve(src);
+                const sr = lookup(sSegs);
+                if (sr.err) { fail("cannot stat '" + src + "': " + ERR[sr.err]); continue; }
+                const node = sr.node;
+                if (node.type === 'd' && !rec) { fail("-r not specified; omitting directory '" + src + "'"); continue; }
+                const base = sSegs.length ? sSegs[sSegs.length - 1] : '';
+                const tSegs = intoDir ? destSegs.concat(base) : destSegs;
+                const tStr = intoDir ? joinPath(destStr, base) : destStr;
+                if (samePath(sSegs, tSegs)) { fail("'" + src + "' and '" + tStr + "' are the same file"); continue; }
+                if (node.type === 'd' && isInside(tSegs, sSegs)) {
+                    fail("cannot copy a directory, '" + src + "', into itself, '" + tStr + "'");
+                    continue;
+                }
+                if (!canRead(node)) { fail("cannot open '" + src + "' for reading: Permission denied"); continue; }
+                const tr = lookup(tSegs);
+                if (!tr.err) {
+                    const t = tr.node;
+                    if (node.type === 'd' && t.type !== 'd') {
+                        fail("cannot overwrite non-directory '" + tStr + "' with directory '" + src + "'");
+                        continue;
+                    }
+                    if (node.type !== 'd' && t.type === 'd') {
+                        fail("cannot overwrite directory '" + tStr + "' with non-directory");
+                        continue;
+                    }
+                    if (node.type === 'd') {
+                        mergeDir(node, t, src, io);
+                    } else {
+                        if (o.has('n')) continue;
+                        if (o.has('i')) {
+                            const answer = await readLine("cp: overwrite '" + tStr + "'? ");
+                            if (!/^y/i.test(answer || '')) continue;
+                        }
+                        if (!canWrite(t)) { fail("cannot create regular file '" + tStr + "': Permission denied"); continue; }
+                        t.content = node.content;
+                        t.prog = node.prog === 'null' ? null : node.prog;
+                        t.mtime = new Date();
+                    }
+                } else {
+                    const c = createNode(tSegs, cloneNode(node, src, io));
+                    if (c.err) {
+                        fail('cannot create ' + (node.type === 'd' ? 'directory' : 'regular file') +
+                            " '" + tStr + "': " + ERR[c.err === 'EEXIST' ? 'EEXIST' : c.err]);
+                        continue;
+                    }
+                }
+                if (o.has('v')) io.out("'" + src + "' -> '" + tStr + "'\n");
+            }
+            return status;
+        },
+
+        async mv(args, io) {
+            const o = parseOpts('mv', args, 'ivnf', io);
+            if (!o) return 1;
+            if (o.help) return showHelp('mv', io);
+            const ops = o.rest;
+            if (!ops.length) {
+                io.err("mv: missing file operand\nTry 'mv --help' for more information.\n");
+                return 1;
+            }
+            if (ops.length === 1) {
+                io.err("mv: missing destination file operand after '" + ops[0] + "'\nTry 'mv --help' for more information.\n");
+                return 1;
+            }
+            const destStr = ops[ops.length - 1];
+            const destSegs = resolve(destStr);
+            const dr = lookup(destSegs);
+            const intoDir = !dr.err && dr.node.type === 'd';
+            if (ops.length > 2 && !intoDir) {
+                io.err("mv: target '" + destStr + "' is not a directory\n");
+                return 1;
+            }
+            let status = 0;
+            const fail = msg => {
+                io.err('mv: ' + msg + '\n');
+                status = 1;
+            };
+            for (const src of ops.slice(0, -1)) {
+                const sSegs = resolve(src);
+                const sr = lookup(sSegs);
+                if (sr.err) { fail("cannot stat '" + src + "': " + ERR[sr.err]); continue; }
+                if (!sSegs.length) { fail("cannot move '/' to '" + destStr + "': Device or resource busy"); continue; }
+                const node = sr.node;
+                const base = sSegs[sSegs.length - 1];
+                const tSegs = intoDir ? destSegs.concat(base) : destSegs;
+                const tStr = intoDir ? joinPath(destStr, base) : destStr;
+                if (samePath(sSegs, tSegs)) { fail("'" + src + "' and '" + tStr + "' are the same file"); continue; }
+                if (isInside(tSegs, sSegs)) {
+                    fail("cannot move '" + src + "' to a subdirectory of itself, '" + tStr + "'");
+                    continue;
+                }
+                const sp = parentOf(sSegs);
+                const tp = parentOf(tSegs);
+                if (tp.err) { fail("cannot move '" + src + "' to '" + tStr + "': " + ERR[tp.err]); continue; }
+                if (!canWrite(sp.dir) || !canWrite(tp.dir) || ((sp.dir.mode & 0o1000) && !isOwner(node))) {
+                    fail("cannot move '" + src + "' to '" + tStr + "': Permission denied");
+                    continue;
+                }
+                const existing = tp.dir.children.get(tp.name);
+                if (existing) {
+                    if (existing.type === 'd' && node.type !== 'd') {
+                        fail("cannot overwrite directory '" + tStr + "' with non-directory");
+                        continue;
+                    }
+                    if (existing.type !== 'd' && node.type === 'd') {
+                        fail("cannot overwrite non-directory '" + tStr + "' with directory '" + src + "'");
+                        continue;
+                    }
+                    if (existing.type === 'd' && existing.children.size) {
+                        fail("cannot move '" + src + "' to '" + tStr + "': Directory not empty");
+                        continue;
+                    }
+                    if (o.has('n')) continue;
+                    if (o.has('i')) {
+                        const answer = await readLine("mv: overwrite '" + tStr + "'? ");
+                        if (!/^y/i.test(answer || '')) continue;
+                    }
+                }
+                sp.dir.children.delete(sp.name);
+                tp.dir.children.set(tp.name, node);
+                sp.dir.mtime = new Date();
+                tp.dir.mtime = new Date();
+                if (samePath(cwd, sSegs) || isInside(cwd, sSegs)) cwd = tSegs.concat(cwd.slice(sSegs.length));
+                if (o.has('v')) io.out("renamed '" + src + "' -> '" + tStr + "'\n");
+            }
+            return status;
+        },
+
+        async rm(args, io) {
+            const o = parseOpts('rm', args, 'rRfivd', io);
+            if (!o) return 1;
+            if (o.help) return showHelp('rm', io);
+            const rec = o.has('r') || o.has('R');
+            const force = o.has('f');
+            if (!o.rest.length) {
+                if (force) return 0;
+                io.err("rm: missing operand\nTry 'rm --help' for more information.\n");
+                return 1;
+            }
+            let status = 0;
+            const fail = msg => {
+                io.err('rm: ' + msg + '\n');
+                status = 1;
+            };
+            for (const p of o.rest) {
+                const last = p.replace(/\/+$/, '').split('/').pop();
+                if (last === '.' || last === '..') {
+                    fail("refusing to remove '.' or '..' directory: skipping '" + p + "'");
+                    continue;
+                }
+                const segs = resolve(p);
+                if (!segs.length) {
+                    if (rec) fail("it is dangerous to operate recursively on '/'\nrm: use --no-preserve-root to override this failsafe");
+                    else fail("cannot remove '/': Is a directory");
+                    continue;
+                }
+                const r = lookup(segs);
+                if (r.err) {
+                    if (!(force && r.err === 'ENOENT')) fail("cannot remove '" + p + "': " + ERR[r.err]);
+                    continue;
+                }
+                const node = r.node;
+                if (node.type === 'd' && !rec) {
+                    if (!o.has('d')) { fail("cannot remove '" + p + "': Is a directory"); continue; }
+                    if (node.children.size) { fail("cannot remove '" + p + "': Directory not empty"); continue; }
+                }
+                if (o.has('i') && !force) {
+                    const kind = node.type === 'd' ? 'directory' : (node.content ? 'regular file' : 'regular empty file');
+                    const answer = await readLine('rm: remove ' + kind + " '" + p + "'? ");
+                    if (!/^y/i.test(answer || '')) continue;
+                }
+                const pr = parentOf(segs);
+                if (!canWrite(pr.dir) || ((pr.dir.mode & 0o1000) && !isOwner(node))) {
+                    fail("cannot remove '" + p + "': Permission denied");
+                    continue;
+                }
+                pr.dir.children.delete(pr.name);
+                pr.dir.mtime = new Date();
+                if (o.has('v')) io.out((node.type === 'd' ? "removed directory '" : "removed '") + p + "'\n");
+            }
+            return status;
+        },
+
+        history(args, io) {
+            if (args[0] === '-c') {
+                hist.length = 0;
+                return 0;
+            }
+            let list = hist.map((h, k) => [k + 1, h]);
+            if (args.length) {
+                if (!/^\d+$/.test(args[0])) {
+                    io.err('bash: history: ' + args[0] + ': numeric argument required\n');
+                    return 1;
+                }
+                const n = parseInt(args[0], 10);
+                list = n ? list.slice(-n) : [];
+            }
+            list.forEach(([k, h]) => io.out(String(k).padStart(5) + '  ' + h + '\n'));
+            return 0;
+        },
+
+        async cat(args, io) {
+            const o = parseOpts('cat', args, 'n', io);
+            if (!o) return 1;
+            if (o.help) return showHelp('cat', io);
+            if (!o.rest.length) {                     // читання з клавіатури до Ctrl+D
+                for (;;) {
+                    const line = await readLine('');
+                    if (line === null) return 0;
+                    io.out(line + '\n');
+                }
+            }
+            let status = 0;
+            let num = 0;
+            o.rest.forEach(p => {
+                const r = lookup(resolve(p));
+                let err = r.err;
+                if (!err && r.node.type === 'd') err = 'EISDIR';
+                if (!err && !canRead(r.node)) err = 'EACCES';
+                if (err) {
+                    io.err('cat: ' + p + ': ' + ERR[err] + '\n');
+                    status = 1;
+                    return;
+                }
+                let text = r.node.content;
+                if (o.has('n') && text) {
+                    const trailing = text.endsWith('\n');
+                    const lines = text.split('\n');
+                    if (trailing) lines.pop();
+                    text = lines.map(l => String(++num).padStart(6) + '\t' + l).join('\n') + (trailing ? '\n' : '');
+                }
+                io.out(text);
+            });
+            return status;
+        },
+
+        chmod(args, io) {
+            if (args[0] === '--help') return showHelp('chmod', io);
+            if (args.length < 2) {
+                io.err("chmod: missing operand\nTry 'chmod --help' for more information.\n");
+                return 1;
+            }
+            const apply = parseMode(args[0]);
+            if (!apply) {
+                io.err("chmod: invalid mode: '" + args[0] + "'\nTry 'chmod --help' for more information.\n");
+                return 1;
+            }
+            let status = 0;
+            args.slice(1).forEach(p => {
+                const r = lookup(resolve(p));
+                if (r.err) {
+                    io.err("chmod: cannot access '" + p + "': " + ERR[r.err] + '\n');
+                    status = 1;
+                } else if (!isOwner(r.node)) {
+                    io.err("chmod: changing permissions of '" + p + "': Operation not permitted\n");
+                    status = 1;
+                } else {
+                    r.node.mode = (r.node.mode & ~0o7777) | (apply(r.node.mode) & 0o7777);
+                }
+            });
+            return status;
+        },
+
+        whoami(args, io) {
+            io.out(USER + '\n');
+            return 0;
+        },
+
+        hostname(args, io) {
+            io.out(HOST + '\n');
+            return 0;
+        },
+
+        date(args, io) {
+            const fmt = args.find(a => a[0] === '+');
+            io.out(fmtDate(new Date(), fmt ? fmt.slice(1) : '%a %b %e %H:%M:%S %Z %Y') + '\n');
+            return 0;
+        },
+
+        uname(args, io) {
+            const o = parseOpts('uname', args, 'asnrvmo', io);
+            if (!o) return 1;
+            if (o.help) return showHelp('uname', io);
+            const all = o.has('a');
+            const any = ['s', 'n', 'r', 'v', 'm', 'o'].some(ch => o.has(ch));
+            const parts = [];
+            if (all || o.has('s') || !any) parts.push('Linux');
+            if (all || o.has('n')) parts.push(HOST);
+            if (all || o.has('r')) parts.push(KERNEL);
+            if (all || o.has('v')) parts.push('#45-Ubuntu SMP PREEMPT_DYNAMIC Fri Aug 30 12:02:04 UTC 2024');
+            if (all) parts.push('x86_64', 'x86_64', 'x86_64');
+            else if (o.has('m')) parts.push('x86_64');
+            if (all || o.has('o')) parts.push('GNU/Linux');
+            io.out(parts.join(' ') + '\n');
+            return 0;
+        },
+
+        clear(args, io) {
+            if (io.tty) clearScreen();
+            return 0;
+        },
+
+        async sleep(args, io) {
+            if (!args.length) {
+                io.err("sleep: missing operand\nTry 'sleep --help' for more information.\n");
+                return 1;
+            }
+            if (!/^\d+(\.\d+)?$/.test(args[0])) {
+                io.err("sleep: invalid time interval '" + args[0] + "'\n");
+                return 1;
+            }
+            await delay(Math.min(parseFloat(args[0]), 30) * 1000);
+            return 0;
+        },
+
+        async read(args, io) {
+            let prompt = '';
+            let secret = false;
+            const names = [];
+            for (let k = 0; k < args.length; k++) {
+                const a = args[k];
+                if (/^-[rsp]+$/.test(a)) {
+                    if (a.includes('s')) secret = true;
+                    if (a.includes('p')) prompt = args[++k] || '';
+                    continue;
+                }
+                if (!/^[A-Za-z_]\w*$/.test(a)) {
+                    io.err("bash: read: `" + a + "': not a valid identifier\n");
+                    return 1;
+                }
+                names.push(a);
+            }
+            const line = await readLine(prompt, { secret });
+            if (line === null) return 1;
+            if (!names.length) names.push('REPLY');
+            const words = line.trim().split(/\s+/);
+            names.forEach((v, k) => {
+                env[v] = k === names.length - 1 ? words.slice(k).join(' ') : (words[k] || '');
+            });
+            return 0;
+        },
+
+        export(args) {
+            args.forEach(a => {
+                const eq = a.indexOf('=');
+                if (eq > 0 && /^[A-Za-z_]\w*$/.test(a.slice(0, eq))) env[a.slice(0, eq)] = a.slice(eq + 1);
+            });
+            return 0;
+        },
+
+        unset(args) {
+            args.forEach(a => { delete env[a]; });
+            return 0;
+        },
+
+        env(args, io) {
+            Object.keys(env).sort().forEach(k => io.out(k + '=' + env[k] + '\n'));
+            return 0;
+        },
+
+        true() { return 0; },
+        false() { return 1; },
+
+        bash(args, io, depth) {
+            if (!args.length || args[0][0] === '-') {
+                io.err('bash: вкладена оболонка в демо не підтримується. Спробуйте: bash login.sh\n');
+                return 1;
+            }
+            return execFile(args[0], args.slice(1), io, depth, true);
+        },
+        sh(args, io, depth) {
+            return COMMANDS.bash(args, io, depth);
+        },
+
+        sudo(args, io) {
+            io.err('sudo: у демо-терміналі права адміністратора (root) недоступні\n');
+            return 1;
+        },
+
+        man(args, io) {
+            if (!args.length) {
+                io.err("What manual page do you want?\nFor example, try 'man man'.\n");
+                return 1;
+            }
+            if (hasOwn(HELP, args[0])) return showHelp(args[0], io);
+            io.err('No manual entry for ' + args[0] + '\n');
+            return 16;
+        },
+
+        exit(args, io) {
+            io.out('exit\n');
+            write(EXIT_NOTE, 'dim');
+            return 0;
+        },
+
+        help(args, io) {
+            const rows = [
+                ['pwd', 'показати поточний каталог'],
+                ['ls [-laRh] [шлях]', 'вміст каталогу'],
+                ['cd [каталог]', 'перейти в каталог (cd .., cd ~, cd -)'],
+                ['mkdir [-p] назва', 'створити каталог'],
+                ['touch файл', 'створити порожній файл'],
+                ['echo текст [> файл]', 'вивести текст або записати у файл'],
+                ['cat файл', 'показати вміст файлу'],
+                ['cp [-r] звідки куди', 'копіювати'],
+                ['mv звідки куди', 'перемістити або перейменувати'],
+                ['rm [-ri] шлях', 'видалити'],
+                ['history, !N, !!', 'історія команд'],
+                ['chmod +x файл', 'дозволити виконання'],
+                ['./login.sh', 'запустити скрипт авторизації'],
+                ['whoami, date, uname, clear', 'інші команди']
+            ];
+            io.out('Команди демо-терміналу (кожна підтримує --help):\n');
+            rows.forEach(([c, d]) => {
+                io.out('  ' + c.padEnd(28), 'c-cyan');
+                io.out(d + '\n');
+            });
+            io.out('Клавіші: Tab — доповнення, ↑/↓ — історія, Ctrl+C — перервати, Ctrl+L — очистити.\n', 'dim');
+            return 0;
+        }
+    };
+    COMMANDS.logout = COMMANDS.exit;
+
+    /* ---------- Обробка введення ---------- */
+    async function runCommand(line) {
+        if (busy) return;
+        echoPrompt(line);
+        let cmd = line;
+        if (cmd.includes('!')) {
+            const hx = expandHistory(cmd);
+            if (hx.err) {
+                write(hx.err + '\n', 'err');
+                lastStatus = 1;
+                setMode('idle');
+                return;
+            }
+            if (hx.changed) {
+                cmd = hx.line;
+                write(cmd + '\n');
+            }
+        }
+        // HISTCONTROL=ignoreboth: без повторів і рядків, що починаються з пробілу
+        if (cmd.trim() && !/^\s/.test(cmd) && cmd !== hist[hist.length - 1]) hist.push(cmd);
+        histPos = hist.length;
+        draft = '';
+        busy = true;
+        run = { aborted: false, handlers: [] };
+        setMode('busy');
+        try {
+            lastStatus = await runLine(cmd, 0, termIO);
+        } catch (e) {
+            if (e instanceof Interrupt) {
+                lastStatus = 130;
+            } else {
+                write('bash: внутрішня помилка демо-терміналу\n', 'err');
+                lastStatus = 1;
+                if (window.console) console.error(e);
+            }
+        }
+        pendingRead = null;
+        run = null;
+        busy = false;
+        curLine = null;
+        setMode('idle');
+    }
+
+    function onEnter() {
+        const mode = formEl.dataset.mode;
+        const value = inputEl.value;
+        if (mode === 'read' && pendingRead) {
+            inputEl.value = '';
+            submitRead(value, false);
+            return;
+        }
+        if (mode !== 'idle') return;
+        inputEl.value = '';
+        runCommand(value);
+    }
+
+    function onCtrlC() {
+        const mode = formEl.dataset.mode;
+        if (mode === 'idle') {
+            promptParts().forEach(([t, c]) => write(t, c));
+            write(inputEl.value, 'tc');
+            write('^C\n');
+            inputEl.value = '';
+            lastStatus = 130;
+            histPos = hist.length;
+            return;
+        }
+        if (mode === 'read' && pendingRead) {
+            write(pendingRead.prompt);
+            if (!pendingRead.secret) {
+                write(inputEl.value, 'tc');
+                write('^C');
+            }
+        } else {
+            write('^C');
+        }
+        inputEl.value = '';
+        interrupt();
+    }
+
+    function onCtrlD() {
+        const mode = formEl.dataset.mode;
+        if (inputEl.value) return;
+        if (mode === 'read' && pendingRead) {
+            submitRead('', true);                     // кінець введення (EOF)
+        } else if (mode === 'idle') {
+            promptParts().forEach(([t, c]) => write(t, c));
+            write('exit\n');
+            write(EXIT_NOTE, 'dim');
+        }
+    }
+
+    function historyNav(dir) {
+        if (!hist.length) return;
+        if (histPos >= hist.length) draft = inputEl.value;
+        histPos = Math.max(0, Math.min(hist.length, histPos + dir));
+        inputEl.value = histPos === hist.length ? draft : hist[histPos];
+        const end = inputEl.value.length;
+        inputEl.setSelectionRange(end, end);
+    }
+
+    const escapeWord = s => s.replace(/([\s'"\\$&;|<>*?!#()`])/g, '\\$1');
+    function complete() {
+        const value = inputEl.value;
+        const caret = inputEl.selectionStart;
+        const before = value.slice(0, caret);
+        const after = value.slice(caret);
+        const word = /[^\s;&|<>]*$/.exec(before)[0];
+        const head = before.slice(0, before.length - word.length);
+        const firstWord = !/\S/.test(head.replace(/^.*(?:;|&&|\|\|)/, ''));
+        let typed;
+        let cands;
+        if (firstWord && !word.includes('/')) {
+            typed = word;
+            cands = Object.keys(COMMANDS).concat('ll')
+                .filter(c => c.startsWith(word)).sort()
+                .map(c => ({ name: c, full: c, dir: false }));
+        } else {
+            const expanded = word.replace(/^~(?=\/|$)/, HOME);
+            const slash = expanded.lastIndexOf('/');
+            const dirPart = expanded.slice(0, slash + 1);
+            typed = expanded.slice(slash + 1);
+            const r = lookup(resolve(dirPart || '.'));
+            if (r.err || r.node.type !== 'd' || !canRead(r.node)) return;
+            const prefix = word.slice(0, word.length - typed.length);
+            cands = Array.from(r.node.children.entries())
+                .filter(([name]) => name.startsWith(typed) && (typed[0] === '.' || name[0] !== '.'))
+                .sort((a, b) => byName(a[0], b[0]))
+                .map(([name, node]) => ({ name, full: prefix + name, dir: node.type === 'd' }));
+        }
+        if (!cands.length) return;
+        const setWord = w => {
+            inputEl.value = head + w + after;
+            const pos = (head + w).length;
+            inputEl.setSelectionRange(pos, pos);
+        };
+        if (cands.length === 1) {
+            setWord(escapeWord(cands[0].full) + (cands[0].dir ? '/' : ' '));
+            return;
+        }
+        const common = cands.map(c => c.name).reduce((a, b) => {
+            let k = 0;
+            while (k < a.length && a[k] === b[k]) k++;
+            return a.slice(0, k);
+        });
+        if (common.length > typed.length) {
+            setWord(escapeWord(word.slice(0, word.length - typed.length) + common));
+            return;
+        }
+        echoPrompt(value);
+        writeGrid(cands.map(c => ({ t: c.name + (c.dir ? '/' : ''), c: c.dir ? 'dir' : '' })));
+    }
+
+    inputEl.addEventListener('keydown', e => {
+        const key = e.key;
+        const ctrl = e.ctrlKey && !e.altKey && !e.metaKey;
+        const mode = formEl.dataset.mode;
+        if (ctrl && (key === 'c' || key === 'C')) {
+            // якщо в полі виділено текст — звичайне копіювання
+            if (mode !== 'busy' && !inputEl.classList.contains('secret') &&
+                inputEl.selectionStart !== inputEl.selectionEnd) return;
+            e.preventDefault();
+            onCtrlC();
+            return;
+        }
+        if (ctrl && (key === 'l' || key === 'L')) {
+            e.preventDefault();
+            clearScreen();
+            return;
+        }
+        if (ctrl && (key === 'd' || key === 'D')) {
+            e.preventDefault();
+            onCtrlD();
+            return;
+        }
+        if (ctrl && (key === 'r' || key === 'R')) {       // не перезавантажувати сторінку
+            e.preventDefault();
+            if (mode === 'idle') write('(reverse-i-search) у демо недоступний — використовуйте ↑/↓ або history\n', 'dim');
+            return;
+        }
+        if (mode !== 'idle') return;
+        if (key === 'ArrowUp') {
+            e.preventDefault();
+            historyNav(-1);
+        } else if (key === 'ArrowDown') {
+            e.preventDefault();
+            historyNav(1);
+        } else if (key === 'Tab' && !e.shiftKey && inputEl.value.trim()) {
+            e.preventDefault();
+            complete();
+        }
+    });
+
+    formEl.addEventListener('submit', e => {
+        e.preventDefault();
+        onEnter();
+    });
+
+    bodyEl.addEventListener('click', () => {
+        const sel = window.getSelection ? String(window.getSelection()) : '';
+        if (!sel) focusInput();
+    });
+
+    function runFromUI(cmd, focus) {
+        if (busy) {
+            focusInput();
+            return;
+        }
+        inputEl.value = '';
+        runCommand(cmd);
+        if (focus || finePointer) focusInput();
+    }
+
+    if (chipsEl) {
+        chipsEl.addEventListener('click', e => {
+            const btn = e.target.closest('button[data-cmd]');
+            if (btn) runFromUI(btn.dataset.cmd, false);
+        });
+    }
+
+    const runBtn = document.getElementById('run-script');
+    if (runBtn) {
+        runBtn.addEventListener('click', () => {
+            const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            term.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' });
+            runFromUI('cd ~ && ./login.sh', true);
+        });
+    }
+
+    function welcome() {
+        write('Ласкаво просимо до Ubuntu 24.04 LTS (GNU/Linux ' + KERNEL + ' x86_64)\n', 'b');
+        write('Це демо-термінал: команди виконуються у вашому браузері на віртуальній файловій системі.\n', 'dim');
+        write('Введіть ', 'dim');
+        write('help', 'c-cyan');
+        write(' — список команд. Спробуйте: ', 'dim');
+        write('ls -la', 'c-cyan');
+        write(', ', 'dim');
+        write('cd Documents', 'c-cyan');
+        write(', ', 'dim');
+        write('./login.sh', 'c-cyan');
+        write('\n\n');
+    }
+
+    const resetBtn = document.getElementById('term-reset');
+    if (resetBtn) {
+        resetBtn.addEventListener('click', () => {
+            const doReset = () => {
+                resetState();
+                clearScreen();
+                welcome();
+                setMode('idle');
+                if (finePointer) focusInput();
+            };
+            if (run) {
+                interrupt();
+                setTimeout(doReset, 0);       // дочекатися завершення перерваної команди
+            } else {
+                doReset();
+            }
+        });
+    }
+
+    resetState();
+    welcome();
+    setMode('idle');
+})();
+</script>
+
+</body>
+</html>
