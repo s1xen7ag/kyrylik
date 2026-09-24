@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Головна | Кирилюк Микола</title>
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            line-height: 1.7;
+            background-color: #0f0f15;
+            color: #e0e0e6;
+            padding-top: 70px;
+        }
+
+        /* ===== LOADER ===== */
+        #loader {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: 99999;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.8s ease;
+        }
+        #loader.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #typewriter {
+            text-align: left;
+            min-width: 320px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        #typewriter div {
+            margin-bottom: 6px;
+            min-height: 1.5em;
+            font-size: 1rem;
+        }
+        #typewriter .prefix { color: #50fa7b; }
+        #typewriter .text { color: #888; }
+        #typewriter .bright .text { color: #ccc; }
+        #typewriter .cursor {
+            display: inline-block;
+            width: 8px;
+            height: 1.1em;
+            background: #50fa7b;
+            vertical-align: text-bottom;
+            animation: blink 0.6s step-end infinite;
+        }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        #loader-logos {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 40px;
+            opacity: 0;
+            transition: opacity 0.6s ease;
+        }
+        #loader-logos.show { opacity: 1; }
+        #loader-logos .logo-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        #loader-logos .logo-item img {
+            width: 44px;
+            height: 44px;
+            object-fit: contain;
+        }
+        #loader-logos .logo-item span {
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        #loader-logos .logo-item svg {
+            width: 44px;
+            height: 44px;
+        }
+        .gemini-label { color: #8be9fd; }
+        .agy-label { color: #f05032; }
+        .claude-label { color: #d97757; }
+        .logo-amp {
+            font-family: 'Courier New', monospace;
+            font-size: 1.2rem;
+            color: #333;
+        }
+        /* Три логотипи на вузькому екрані телефона */
+        @media (max-width: 440px) {
+            #loader-logos { gap: 14px; }
+            #loader-logos .logo-item span { font-size: 0.6rem; letter-spacing: 1px; }
+        }
+
+        /* ===== HEADER ===== */
+        header {
+            position: fixed; top: 0; left: 0; width: 100%;
+            background: rgba(13,13,18,0.95);
+            border-bottom: 2px solid #f05032;
+            z-index: 1000;
+        }
+        .nav-container {
+            max-width: 1000px; margin: 0 auto;
+            display: flex; justify-content: space-between;
+            align-items: center; padding: 0.8rem 2rem;
+        }
+        .logo-link {
+            font-size: 1.4rem; font-weight: 800;
+            text-decoration: none; color: #fff;
+        }
+        .logo-link span { color: #f05032; }
+        nav ul { list-style: none; display: flex; gap: 24px; }
+        nav li { padding: 0; margin: 0; }
+        nav a {
+            color: #b0b0b8; text-decoration: none; font-weight: 600;
+            font-size: 0.95rem; transition: color 0.3s;
+        }
+        nav a:hover, nav a.active { color: #fff; }
+
+        /* ===== HERO ===== */
+        .container {
+            max-width: 850px; margin: 0 auto;
+            padding: 3rem 2rem; text-align: center;
+        }
+        .hero {
+            background: linear-gradient(145deg, #16161e, #1c1c26);
+            padding: 3.5rem; border-radius: 16px;
+            border: 1px solid #2a2a36; margin-top: 2rem;
+        }
+        h1 {
+            color: #fff; font-size: 2rem; font-weight: 800;
+            margin-bottom: 1rem;
+        }
+        h1 em { font-style: normal; color: #f05032; }
+        .hero p {
+            font-size: 1.05rem; color: #999;
+            max-width: 600px; margin: 0 auto 0.8rem;
+        }
+        .btn-container {
+            margin-top: 2.5rem; display: flex;
+            justify-content: center; gap: 16px; flex-wrap: wrap;
+        }
+        .btn {
+            background: linear-gradient(135deg, #f05032, #d43f21);
+            color: #fff; padding: 13px 28px;
+            text-decoration: none; border-radius: 8px;
+            font-weight: 700; font-size: 0.95rem;
+            transition: transform 0.2s, box-shadow 0.3s;
+            box-shadow: 0 4px 18px rgba(240,80,50,0.25);
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(240,80,50,0.4);
+        }
+        .btn-alt {
+            background: linear-gradient(135deg, #2a2a36, #3a3a44);
+            box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+        }
+
+        footer {
+            text-align: center; padding: 2rem; margin-top: 2rem;
+            color: #555; font-size: 0.85rem;
+            border-top: 1px solid #1a1a24;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== LOADER (показується 1 раз) ===== -->
+<div id="loader">
+    <div id="typewriter"></div>
+    <div id="loader-logos">
+        <div class="logo-item">
+            <!-- Поклади файл gemini-logo.png поруч з index.html -->
+            <img src="gemini-removebg-preview.png" alt="Gemini">
+            <span class="gemini-label">Gemini</span>
+        </div>
+        <span class="logo-amp">&amp;</span>
+        <div class="logo-item">
+            <!-- Поклади файл antigravity-logo.png поруч з index.html -->
+            <img src="antigravity-removebg-preview.png" alt="Antigravity">
+            <span class="agy-label">Antigravity</span>
+        </div>
+        <span class="logo-amp">&amp;</span>
+        <div class="logo-item">
+            <!-- Іконка Claude вбудована прямо в код (SVG), окремий файл не потрібен -->
+            <svg viewBox="0 0 100 100" role="img" aria-label="Claude"><path fill="#d97757" d="M47.6 50L43.2 9A6.8 6.8 0 0 1 56.8 9L52.4 50ZM48 48.7L62.8 18.8A6.8 6.8 0 0 1 74.1 26.4L52 51.3ZM48.7 48L78.2 23.6A6.8 6.8 0 0 1 85.6 35L51.3 52ZM50.2 47.6L81.5 45.9A6.8 6.8 0 0 1 80.3 59.5L49.8 52.4ZM51.1 47.9L89.4 63.2A6.8 6.8 0 0 1 83 75.3L48.9 52.1ZM52.1 48.9L71.5 77.2A6.8 6.8 0 0 1 59.4 83.4L47.9 51.1ZM52.4 50L56.8 87A6.8 6.8 0 0 1 43.2 87L47.6 50ZM52.2 51L43.5 80.1A6.8 6.8 0 0 1 31.2 74.3L47.8 49ZM51.1 52.1L17.4 74.2A6.8 6.8 0 0 1 11.3 62.1L48.9 47.9ZM50.1 52.4L17.4 58.5A6.8 6.8 0 0 1 16.7 44.9L49.9 47.6ZM48.7 52L14.2 35.6A6.8 6.8 0 0 1 21.4 24.1L51.3 48ZM48 51.3L26.5 27.3A6.8 6.8 0 0 1 37.7 19.7L52 48.7Z"/><circle cx="50" cy="50" r="9" fill="#d97757"/></svg>
+            <span class="claude-label">Claude</span>
+        </div>
+    </div>
+</div>
+
+<!-- ===== HEADER ===== -->
+<header>
+    <div class="nav-container">
+        <a href="index.html" class="logo-link">Кирилюк<span>.Микола</span></a>
+        <nav>
+            <ul>
+                <li><a href="index.html" class="active">Головна</a></li>
+                <li><a href="git.html">Робота з Git</a></li>
+                <li><a href="bash.html">Команди Bash</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<!-- ===== CONTENT ===== -->
+<div class="container">
+    <div class="hero">
+        <h1>Звіт про вивчення систем <em>контролю версій</em></h1>
+        <p>Цей веб-ресурс створено для демонстрації практичних навичок роботи з розподіленою системою контролю версій Git та командним інтерфейсом.</p>
+        <p>Оберіть потрібний розділ у меню або скористайтеся кнопками нижче.</p>
+        <div class="btn-container">
+            <a href="git.html" class="btn">Вивчити Git</a>
+            <a href="bash.html" class="btn btn-alt">Шпаргалка Bash</a>
+        </div>
+    </div>
+</div>
+
+<footer>&copy; 2026 Кирилюк Микола</footer>
+
+<script>
+var loader = document.getElementById('loader');
+
+// Визначаємо: чи прийшов з іншої сторінки цього ж сайту?
+var fromSameSite = document.referrer && document.referrer.indexOf(location.hostname) !== -1;
+
+// Визначаємо: чи це F5 (перезавантаження)?
+var isReload = false;
+try {
+    var nav = performance.getEntriesByType('navigation');
+    if (nav.length > 0) isReload = nav[0].type === 'reload';
+} catch(e) {}
+
+// Показуємо loader при F5 або першому відвідуванні
+// Ховаємо при переході з git.html / bash.html
+if (fromSameSite && !isReload) {
+    loader.style.display = 'none';
+} else {
+    var lines = [
+        { text: 'Завантаження...' },
+        { text: 'Ініціалізація компонентів...' },
+        { text: 'Створено за допомогою ШІ', bright: true }
+    ];
+    var area = document.getElementById('typewriter');
+    var logos = document.getElementById('loader-logos');
+    var i = 0;
+
+    function typeLine(data, cb) {
+        var div = document.createElement('div');
+        if (data.bright) div.className = 'bright';
+
+        var pre = document.createElement('span');
+        pre.className = 'prefix';
+        pre.textContent = '> ';
+        div.appendChild(pre);
+
+        var txt = document.createElement('span');
+        txt.className = 'text';
+        div.appendChild(txt);
+
+        var cur = document.createElement('span');
+        cur.className = 'cursor';
+        div.appendChild(cur);
+
+        area.appendChild(div);
+
+        var full = data.text;
+        var c = 0;
+        function next() {
+            if (c < full.length) {
+                txt.textContent += full[c];
+                c++;
+                setTimeout(next, 40 + Math.random() * 25);
+            } else {
+                cur.style.display = 'none';
+                setTimeout(cb, 200);
+            }
+        }
+        setTimeout(next, 150);
+    }
+
+    function go() {
+        if (i < lines.length) {
+            typeLine(lines[i], function() { i++; go(); });
+        } else {
+            setTimeout(function() { logos.classList.add('show'); }, 300);
+            setTimeout(function() {
+                loader.classList.add('fade-out');
+                setTimeout(function() { loader.style.display = 'none'; }, 900);
+            }, 2200);
+        }
+    }
+    setTimeout(go, 400);
+}
+</script>
+
+</body>
+</html>
